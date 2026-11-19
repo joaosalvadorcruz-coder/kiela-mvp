@@ -1,0 +1,2978 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kiela — Inteligência Urbana &amp; Economia Circular</title>
+
+<script>
+window.addEventListener('error', function(ev){
+  var r = document.getElementById('root');
+  if (r && !r.dataset.mounted) {
+    r.innerHTML = '<div style="padding:24px;font-family:system-ui,sans-serif;color:#7f1d1d;background:#fef2f2;border:2px solid #dc2626;border-radius:12px;margin:24px;max-width:900px"><h2 style="margin:0 0 8px">Erro de Inicialização</h2><p><b>'+(ev.message||'?')+'</b></p><p style="font-size:13px">'+(ev.filename||'?')+' : '+(ev.lineno||'?')+'</p></div>';
+  }
+});
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+try {
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          obsidian: { 950: '#141210', 900: '#1c1917', 800: '#292524', 700: '#44403c' },
+          ochre:    { 400: '#fbbf24', 500: '#d97706', 600: '#b45309' },
+          terra:    { 500: '#ea580c', 600: '#c2410c' },
+          savanna:  { 500: '#10b981', 600: '#0f766e', 700: '#115e59' },
+          sand:     { 50: '#faf8f5', 100: '#f5f2ed', 200: '#e7e5e4', 300: '#d6d3d1' }
+        },
+        keyframes: {
+          pulseRing: { '0%': { transform: 'scale(0.85)', opacity: '0.9' }, '100%': { transform: 'scale(2.1)', opacity: '0' } },
+          slideIn:   { '0%': { transform: 'translateX(110%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+          fadeUp:    { '0%': { transform: 'translateY(8px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+        },
+        animation: {
+          'pulse-ring': 'pulseRing 1.8s cubic-bezier(0.24,0,0.38,1) infinite',
+          'slide-in':   'slideIn 0.28s ease-out',
+          'fade-up':    'fadeUp 0.32s ease-out'
+        }
+      }
+    }
+  };
+} catch (e) {}
+</script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<style>
+  body { font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background-color: #faf8f5; color: #1c1917; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .leaflet-container { font: inherit; }
+  input[type=range] { accent-color: #d97706; }
+  @media print { .no-print { display: none !important; } body { background: #fff !important; } }
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+  #root { min-height: 100vh; }
+  .samakaka-bg {
+    background-color: #1c1917;
+    background-image: url("data:image/svg+xml,%3Csvg width='56' height='56' viewBox='0 0 56 56' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23d97706' stroke-opacity='0.09' stroke-width='1.2'%3E%3Cpolygon points='28,4 52,28 28,52 4,28'/%3E%3Cpolygon points='28,14 42,28 28,42 14,28'/%3E%3Cpath d='M0,0 L14,14 M56,0 L42,14 M0,56 L14,42 M56,56 L42,42'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .afro-ribbon {
+    height: 4px;
+    background: linear-gradient(90deg, #d97706 0%, #c2410c 50%, #0f766e 100%);
+  }
+  .pulse-pin { animation: pulse-pin-anim 1.6s ease-out infinite; }
+  @keyframes pulse-pin-anim {
+    0%   { box-shadow: 0 0 0 0 rgba(194, 65, 12, 0.8); }
+    70%  { box-shadow: 0 0 0 13px rgba(194, 65, 12, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(194, 65, 12, 0); }
+  }
+</style>
+</head>
+<body class="bg-sand-50 text-obsidian-900">
+<div id="root">
+  <div style="padding:56px 24px;font-family:system-ui,sans-serif;color:#1c1917;text-align:center">
+    <div style="width:52px;height:52px;margin:0 auto 12px;border-radius:14px;background:linear-gradient(135deg,#d97706,#c2410c,#0f766e);display:flex;align-items:center;justify-content:center">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12,2 22,12 12,22 2,12"/><polygon points="12,7 17,12 12,17 7,12"/>
+      </svg>
+    </div>
+    <h2 style="margin:0 0 4px;font-weight:800">Kiela</h2>
+    <p style="margin:0;font-size:14px;color:#78716c">A inicializar plataforma de Inteligência Urbana &amp; Economia Circular...</p>
+  </div>
+</div>
+
+<script type="text/babel" data-presets="react">
+/** @jsxRuntime classic */
+/** @jsx React.createElement */
+
+if (typeof React === 'undefined') throw new Error('React não carregou');
+if (typeof ReactDOM === 'undefined') throw new Error('ReactDOM não carregou');
+
+const HAS_RECHARTS = typeof Recharts !== 'undefined';
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+const RC = HAS_RECHARTS ? Recharts : {};
+const ResponsiveContainer = RC.ResponsiveContainer || (({ children }) => <div style={{ padding: 8, color: '#78716c', fontSize: 12 }}>Gráfico indisponível</div>);
+const BarChart = RC.BarChart || (() => null);
+const Bar = RC.Bar || (() => null);
+const XAxis = RC.XAxis || (() => null);
+const YAxis = RC.YAxis || (() => null);
+const Tooltip = RC.Tooltip || (() => null);
+const CartesianGrid = RC.CartesianGrid || (() => null);
+const PieChart = RC.PieChart || (() => null);
+const Pie = RC.Pie || (() => null);
+const Cell = RC.Cell || (() => null);
+const LineChart = RC.LineChart || (() => null);
+const Line = RC.Line || (() => null);
+const Legend = RC.Legend || (() => null);
+
+/* ============================================================================
+ * 1. IDENTIDADE VISUAL KIELA & ÍCONES VECTORIAIS PUROS (ARRAYS DE PATHS)
+ * ========================================================================== */
+
+function KielaLogo({ size = 40 }) {
+  return (
+    <div
+      style={{ width: size, height: size }}
+      className="rounded-xl bg-gradient-to-br from-ochre-500 via-terra-600 to-savanna-600 flex items-center justify-center shadow-md flex-shrink-0 border border-white/15"
+    >
+      <svg width={Math.round(size * 0.6)} height={Math.round(size * 0.6)} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12,2 22,12 12,22 2,12" />
+        <polygon points="12,6.5 17.5,12 12,17.5 6.5,12" />
+        <circle cx="12" cy="12" r="1.6" fill="#ffffff" />
+      </svg>
+    </div>
+  );
+}
+
+const ICON_SHAPES = {
+  dashboard: ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z'],
+  search:    ['M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z', 'M21 21l-4.35-4.35'],
+  map:       ['M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z', 'M9 3v15', 'M15 6v15'],
+  trash:     ['M3 6h18', 'M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2', 'M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6', 'M10 11v6', 'M14 11v6'],
+  sensor:    ['M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0', 'M16.24 7.76a6 6 0 0 1 0 8.49', 'M7.76 16.24a6 6 0 0 1 0-8.49', 'M19.07 4.93a10 10 0 0 1 0 14.14', 'M4.93 19.07a10 10 0 0 1 0-14.14'],
+  truck:     ['M1 4h15v12H1z', 'M16 8h4l3 3v5h-7V8z', 'M5.5 18.5m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0', 'M18.5 18.5m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0'],
+  route:     ['M6 19m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0', 'M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15', 'M18 5m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0'],
+  phone:     ['M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z', 'M12 18h.01'],
+  check:     ['M22 11.08V12a10 10 0 1 1-5.93-9.14', 'M22 4L12 14.01l-3-3'],
+  megaphone: ['M3 11l18-5v12L3 14v-3z', 'M11.6 16.8a3 3 0 1 1-5.8-1.6'],
+  leaf:      ['M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z', 'M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12'],
+  chart:     ['M18 20V10', 'M12 20V4', 'M6 20v-6'],
+  shield:    ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', 'M9 12l2 2 4-4'],
+  alert:     ['M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z', 'M12 9v4', 'M12 17h.01'],
+  spark:     ['M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z'],
+  play:      ['M5 3l14 9-14 9V3z'],
+  refresh:   ['M23 4v6h-6', 'M20.49 15a9 9 0 1 1-2.12-9.36L23 10'],
+  bell:      ['M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9', 'M13.73 21a2 2 0 0 1-3.46 0'],
+  qr:        ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M3 14h7v7H3z', 'M14 14v3', 'M18 14h3', 'M14 21h7', 'M21 17v4'],
+  print:     ['M6 9V2h12v7', 'M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2', 'M6 14h12v8H6z'],
+  download:  ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'],
+  plus:      ['M12 5v14', 'M5 12h14'],
+  close:     ['M18 6L6 18', 'M6 6l12 12'],
+  pin:       ['M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z', 'M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0'],
+  award:     ['M12 8m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0', 'M15.477 12.89L17 22l-5-3-5 3 1.523-9.11'],
+  info:      ['M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0', 'M12 16v-4', 'M12 8h.01'],
+  menu:      ['M3 12h18', 'M3 6h18', 'M3 18h18'],
+  compass:   ['M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0', 'M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z'],
+  satellite: ['M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0 -20 0', 'M2 12h20', 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'],
+  road:      ['M4 19L8 5', 'M20 19L16 5', 'M12 6v2', 'M12 11v2', 'M12 16v2'],
+  send:      ['M22 2L11 13', 'M22 2l-7 20-4-9-9-4 20-7z'],
+  coin:      ['M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0', 'M14.5 9.5a2.5 2.5 0 0 0-5 0c0 2.5 5 2 5 4.5a2.5 2.5 0 0 1-5 0', 'M12 6v12'],
+  fuel:      ['M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'],
+  flame:     ['M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'],
+  camera:    ['M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z', 'M12 13m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0'],
+};
+
+function Icon({ name, className = 'w-4 h-4' }) {
+  const paths = ICON_SHAPES[name] || ICON_SHAPES.info;
+  return (
+    <svg className={`inline-block flex-shrink-0 ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths.map((d, idx) => <path key={idx} d={d} />)}
+    </svg>
+  );
+}
+
+/* ============================================================================
+ * 2. CONSTANTES DE DOMÍNIO, ESTADO DOS CONTENTORES E UTILITÁRIOS GEOGRÁFICOS
+ * ========================================================================== */
+
+const STORAGE_KEY = 'kiela_angola_v1';
+
+const STATUS = {
+  available:     { label: 'Disponível',      color: '#0f766e', bg: 'bg-teal-100',   text: 'text-teal-900'   },
+  attention:     { label: 'Atenção',         color: '#d97706', bg: 'bg-amber-100',  text: 'text-amber-900'  },
+  full:          { label: 'Cheio',           color: '#ea580c', bg: 'bg-orange-100', text: 'text-orange-900' },
+  critical:      { label: 'Crítico (≥90%)',  color: '#c2410c', bg: 'bg-red-100',    text: 'text-red-900'    },
+  sensor_offline:{ label: 'Sensor Offline',  color: '#78716c', bg: 'bg-stone-200',  text: 'text-stone-800'  },
+  sensor_broken: { label: 'Sensor Avariado', color: '#44403c', bg: 'bg-stone-300',  text: 'text-stone-900'  },
+};
+
+const COLLECTION_STATUS = {
+  confirmed:     'Recolha auditada (Aterro/Triagem)',
+  partial:       'Recolha parcialmente concluída',
+  not_confirmed: 'Recolha pendente',
+  occurrence:    'Ocorrência registada',
+};
+
+const CITIZEN_STATUS = {
+  pending:    { label: 'Pendente',            bg: 'bg-amber-100',  text: 'text-amber-900'  },
+  dispatched: { label: 'Priorizado p/ Rota', bg: 'bg-orange-100', text: 'text-orange-900' },
+  resolved:   { label: 'Resolvido',           bg: 'bg-teal-100',   text: 'text-teal-900'   },
+};
+
+const PROVINCES = [
+  'Luanda', 'Benguela', 'Huambo', 'Huíla', 'Cabinda', 'Malanje', 'Namibe',
+  'Uíge', 'Zaire', 'Cuanza Norte', 'Cuanza Sul', 'Bengo', 'Bié', 'Cunene',
+  'Cuando Cubango', 'Lunda Norte', 'Lunda Sul', 'Moxico'
+];
+
+const nowIso  = () => new Date().toISOString();
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+const uid     = (p) => p + '-' + Date.now().toString(36).slice(-5) + Math.random().toString(36).slice(2, 5);
+const sleep   = (ms) => new Promise(r => setTimeout(r, ms));
+
+function buildGoogleMapsPlaceUrl(lat, lng) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
+}
+
+function buildGoogleMapsDirectionsUrl(stops, originCoords = null) {
+  if (!stops || stops.length === 0) return 'https://www.google.com/maps';
+  const points = originCoords ? [originCoords, ...stops] : [...stops];
+  if (points.length === 1) {
+    return `https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=${encodeURIComponent(`${points[0].lat},${points[0].lng}`)}`;
+  }
+  const origin = `${points[0].lat},${points[0].lng}`;
+  const destination = `${points[points.length - 1].lat},${points[points.length - 1].lng}`;
+  const middle = points.slice(1, -1).slice(0, 20).map(p => `${p.lat},${p.lng}`).join('|');
+  let url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+  if (middle) url += `&waypoints=${encodeURIComponent(middle)}`;
+  return url;
+}
+
+function haversine(a, b) {
+  const R = 6371;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+function statusKey(c, sensors, thresholds = { critical: 90, full: 75 }) {
+  const s = sensors.find(x => x.id === c.sensorId);
+  if (!s || s.status === 'avariado') return 'sensor_broken';
+  if (s.connectivity === 'offline') return 'sensor_offline';
+  if (c.fillLevel >= thresholds.critical) return 'critical';
+  if (c.fillLevel >= thresholds.full) return 'full';
+  if (c.fillLevel >= 50) return 'attention';
+  return 'available';
+}
+
+function optimizeRoute(containers, sensors, vehicle, targetProvince = 'all') {
+  const priority = containers.filter(c => {
+    if (targetProvince !== 'all' && c.province !== targetProvince) return false;
+    const k = statusKey(c, sensors);
+    return (k === 'full' || k === 'critical' || k === 'attention') && c.fillLevel >= 50;
+  }).sort((a, b) => b.fillLevel - a.fillLevel);
+
+  const limit = vehicle.capacityStops || 14;
+  const remaining = priority.slice(0, Math.max(limit, 1));
+  const ordered = [];
+  let cur = { lat: vehicle.lat, lng: vehicle.lng };
+
+  while (remaining.length) {
+    let bi = 0, bd = Infinity, bestDist = 0;
+    remaining.forEach((c, i) => {
+      const dist = haversine(cur, c);
+      const urgencyWeight = c.fillLevel >= 90 ? 0.6 : c.fillLevel >= 75 ? 0.85 : 1.0;
+      const score = dist * urgencyWeight;
+      if (score < bd) { bd = score; bestDist = dist; bi = i; }
+    });
+    const next = remaining.splice(bi, 1)[0];
+    ordered.push({ ...next, distFromPrev: +bestDist.toFixed(2) });
+    cur = next;
+  }
+  return ordered;
+}
+
+/* ============================================================================
+ * 3. TOASTS, CONTADORES ANIMADOS E SPARKLINES SVG
+ * ========================================================================== */
+
+const ToastCtx = React.createContext(null);
+const useToast = () => React.useContext(ToastCtx);
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const show = useCallback((msg, type = 'info', duration = 3500) => {
+    const id = uid('TOAST');
+    setToasts(t => [...t, { id, msg, type }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), duration);
+  }, []);
+  const iconMap = { success: 'check', error: 'alert', warn: 'alert', info: 'info' };
+  const colors  = { success: 'bg-savanna-600', error: 'bg-terra-600', warn: 'bg-ochre-600', info: 'bg-obsidian-900' };
+
+  return (
+    <ToastCtx.Provider value={show}>
+      {children}
+      <div className="fixed bottom-4 right-4 z-[3000] space-y-2 pointer-events-none max-w-sm">
+        {toasts.map(t => (
+          <div key={t.id} className={`pointer-events-auto rounded-xl shadow-2xl px-4 py-3 text-sm text-white flex items-center gap-2.5 animate-slide-in border border-white/10 ${colors[t.type] || colors.info}`}>
+            <Icon name={iconMap[t.type] || 'info'} className="w-4 h-4 text-white" />
+            <span className="flex-1">{t.msg}</span>
+          </div>
+        ))}
+      </div>
+    </ToastCtx.Provider>
+  );
+}
+
+function useCountUp(target, duration = 600) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf;
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return val;
+}
+
+function AnimatedKPI({ value, suffix = '' }) {
+  const v = useCountUp(typeof value === 'number' ? value : 0);
+  return <span className="tabular-nums">{v.toLocaleString('pt-PT')}{suffix}</span>;
+}
+
+function Sparkline({ points = [18, 22, 20, 26, 24, 28, 31], color = '#0f766e' }) {
+  const max = Math.max(...points, 1);
+  const min = Math.min(...points, 0);
+  const span = Math.max(1, max - min);
+  const coords = points.map((p, i) => {
+    const x = (i / Math.max(1, points.length - 1)) * 76 + 2;
+    const y = 26 - ((p - min) / span) * 20;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return (
+    <svg width="80" height="30" viewBox="0 0 80 30" className="overflow-visible">
+      <polyline fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" points={coords} />
+    </svg>
+  );
+}
+
+/* ============================================================================
+ * 4. BASE DE DADOS INICIAL DE ANGOLA (VIANA, BELAS, INGOMBOTA, ZANGO, ETC.)
+ * ========================================================================== */
+
+function buildSeed() {
+  const locations = [
+    // LUANDA
+    { province: 'Luanda', municipality: 'Viana',         neighborhood: 'Distrito Urbano de Viana Sede',  street: 'Rua Dr. Agostinho Neto - Viana',   lat: -8.9024,  lng: 13.3728, fill: 94, temp: 36, tilt: 'Estável', cons: 'Bom',        batt: 89, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Viana',         neighborhood: 'Distrito Urbano da Estalagem',   street: 'Estrada Direita da Estalagem',     lat: -8.8958,  lng: 13.3562, fill: 83, temp: 33, tilt: 'Estável', cons: 'Razoável',   batt: 74, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Viana',         neighborhood: 'Comuna do Zango',                street: 'Rua Direita do Zango 3',           lat: -8.9865,  lng: 13.3941, fill: 91, temp: 49, tilt: 'Estável', cons: 'Bom',        batt: 91, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Ingombota',     neighborhood: 'Distrito Urbano da Ingombota',   street: 'Av. Murtala Mohamed',              lat: -8.7952,  lng: 13.2268, fill: 92, temp: 31, tilt: 'Estável', cons: 'Bom',        batt: 88, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Ingombota',     neighborhood: 'Distrito Urbano da Ingombota',   street: 'Largo da Mutamba',                 lat: -8.8147,  lng: 13.2344, fill: 78, temp: 32, tilt: 'Estável', cons: 'Bom',        batt: 76, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Maianga',       neighborhood: 'Distrito Urbano da Maianga',     street: 'Rua Comandante Gika',              lat: -8.8365,  lng: 13.2421, fill: 61, temp: 30, tilt: 'Estável', cons: 'Bom',        batt: 92, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Talatona',      neighborhood: 'Distrito Urbano de Talatona',    street: 'Via S8 - Belas Business',          lat: -8.9182,  lng: 13.1845, fill: 28, temp: 29, tilt: 'Estável', cons: 'Bom',        batt: 95, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Belas',         neighborhood: 'Distrito Urbano do Kilamba',     street: 'Av. Imperial Santana - Kilamba',   lat: -9.0014,  lng: 13.2689, fill: 88, temp: 34, tilt: 'Estável', cons: 'Razoável',   batt: 64, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Belas',         neighborhood: 'Comuna da Barra do Kwanza',      street: 'Estrada Nacional EN-100 - Belas',  lat: -9.0320,  lng: 13.2110, fill: 42, temp: 30, tilt: 'Estável', cons: 'Bom',        batt: 87, conn: 'online',  st: 'ok' },
+    { province: 'Luanda', municipality: 'Cacuaco',       neighborhood: 'Distrito Urbano de Cacuaco',     street: 'Via Expressa — Acesso Mulenvos',   lat: -8.8380,  lng: 13.3885, fill: 45, temp: 31, tilt: 'Estável', cons: 'Bom',        batt: 19, conn: 'offline', st: 'ok' },
+    { province: 'Luanda', municipality: 'Kilamba Kiaxi', neighborhood: 'Distrito Urbano do Golfe',       street: 'Rua 45 - Projecto Nova Vida',      lat: -8.8945,  lng: 13.2276, fill: 73, temp: 31, tilt: 'Estável', cons: 'Bom',        batt: 83, conn: 'online',  st: 'ok' },
+    // BENGUELA
+    { province: 'Benguela', municipality: 'Benguela',    neighborhood: 'Zona A - Praia Morena',          street: 'Av. Fausto Frazão',                lat: -12.5763, lng: 13.3982, fill: 91, temp: 32, tilt: 'Estável', cons: 'Bom',        batt: 85, conn: 'online',  st: 'ok' },
+    { province: 'Benguela', municipality: 'Lobito',      neighborhood: 'Comuna da Restinga',             street: 'Av. da Independência',             lat: -12.3489, lng: 13.5461, fill: 79, temp: 30, tilt: 'Estável', cons: 'Razoável',   batt: 68, conn: 'online',  st: 'ok' },
+    // HUAMBO
+    { province: 'Huambo', municipality: 'Huambo',        neighborhood: 'Comuna da Cidade Alta',          street: 'Av. Norton de Matos',              lat: -12.7761, lng: 15.7392, fill: 85, temp: 25, tilt: 'Estável', cons: 'Bom',        batt: 89, conn: 'online',  st: 'ok' },
+    { province: 'Huambo', municipality: 'Huambo',        neighborhood: 'Comuna de São Pedro',            street: 'Largo Dr. Agostinho Neto',         lat: -12.7692, lng: 15.7311, fill: 92, temp: 26, tilt: 'Inclinado', cons: 'Danificado', batt: 50, conn: 'online', st: 'avariado' },
+    // HUÍLA
+    { province: 'Huíla', municipality: 'Lubango',        neighborhood: 'Comuna Sede - Centro',           street: 'Av. Dr. António Agostinho Neto',   lat: -14.9172, lng: 13.4925, fill: 77, temp: 24, tilt: 'Estável', cons: 'Bom',        batt: 84, conn: 'online',  st: 'ok' },
+    { province: 'Huíla', municipality: 'Lubango',        neighborhood: 'Bairro dos Laureanos',           street: 'Rua Pinheiro Chagas',              lat: -14.9115, lng: 13.5042, fill: 93, temp: 27, tilt: 'Estável', cons: 'Razoável',   batt: 61, conn: 'online',  st: 'ok' },
+    // CABINDA
+    { province: 'Cabinda', municipality: 'Cabinda',      neighborhood: 'Comuna Sede - Chiweca',          street: 'Av. Duque de Chiazi',              lat: -5.5542,  lng: 12.1985, fill: 81, temp: 32, tilt: 'Estável', cons: 'Bom',        batt: 77, conn: 'online',  st: 'ok' },
+  ];
+
+  const containers = [];
+  const sensors = [];
+  locations.forEach((loc, idx) => {
+    const n = idx + 1;
+    const code = 'KL-' + String(n).padStart(4, '0');
+    const sensorId = 'SN-' + String(n).padStart(4, '0');
+    containers.push({
+      id: code, code,
+      province: loc.province, municipality: loc.municipality,
+      neighborhood: loc.neighborhood, street: loc.street,
+      lat: loc.lat, lng: loc.lng, fillLevel: loc.fill,
+      conservation: loc.cons, sensorId,
+      lastCollectionAt: new Date(Date.now() - (10 + (idx % 36)) * 3600e3).toISOString(),
+    });
+    sensors.push({
+      id: sensorId, containerId: code,
+      battery: loc.batt, connectivity: loc.conn, status: loc.st,
+      temperatureC: loc.temp, tiltStatus: loc.tilt,
+      bufferedPackets: loc.conn === 'offline' ? 14 : 0,
+      lastReadingAt: new Date(Date.now() - (idx % 5) * 1200e3).toISOString(),
+      lastReadingLevel: loc.fill,
+    });
+  });
+
+  const drivers = [
+    { id: 'DRV-01', name: 'Carlos Manuel',    phone: '+244 923 410 101', license: 'AO-LD-88412', status: 'active' },
+    { id: 'DRV-02', name: 'Domingas António', phone: '+244 931 520 202', license: 'AO-LD-44109', status: 'active' },
+    { id: 'DRV-03', name: 'Mateus Sebastião', phone: '+244 924 630 303', license: 'AO-BG-71920', status: 'active' },
+    { id: 'DRV-04', name: 'Helena Cassoma',   phone: '+244 935 740 404', license: 'AO-HL-30918', status: 'active' },
+  ];
+
+  const vehicles = [
+    { id: 'V-01', plate: 'LD-42-81-HG', type: 'Compactador 12m³',  capacityTons: 10, capacityStops: 14, driverId: 'DRV-01', status: 'available',   lat: -8.9010,  lng: 13.3680, kmTotal: 14820, fuelSavedKz: 485000 },
+    { id: 'V-02', plate: 'LD-19-04-AA', type: 'Compactador 8m³',   capacityTons: 7,  capacityStops: 12, driverId: 'DRV-02', status: 'available',   lat: -8.9950,  lng: 13.2750, kmTotal: 9340,  fuelSavedKz: 342000 },
+    { id: 'V-03', plate: 'BG-77-12-CC', type: 'Camião basculante', capacityTons: 12, capacityStops: 16, driverId: 'DRV-03', status: 'available',   lat: -12.5790, lng: 13.4040, kmTotal: 21150, fuelSavedKz: 410000 },
+    { id: 'V-04', plate: 'HB-31-90-DD', type: 'Compactador 8m³',   capacityTons: 7,  capacityStops: 12, driverId: 'DRV-04', status: 'maintenance', lat: -12.7780, lng: 15.7410, kmTotal: 18400, fuelSavedKz: 218000 },
+  ];
+
+  const collections = [];
+  const statuses = ['confirmed', 'confirmed', 'confirmed', 'confirmed', 'partial', 'occurrence'];
+  const destinations = ['Aterro Sanitário dos Mulenvos', 'Central de Triagem de Viana', 'Aterro Sanitário dos Mulenvos'];
+  for (let i = 0; i < 22; i++) {
+    const c = containers[i % containers.length];
+    const v = vehicles[i % 3];
+    const st = statuses[i % statuses.length];
+    const km = 5 + (i % 12);
+    collections.push({
+      id: 'REC-' + String(i + 1).padStart(4, '0'),
+      containerId: c.code, containerCode: c.code,
+      vehicleId: v.id, vehiclePlate: v.plate, driverId: v.driverId,
+      municipality: c.municipality, province: c.province,
+      destination: destinations[i % destinations.length],
+      timestamp: new Date(Date.now() - (i * 5 + 1) * 3600e3).toISOString(),
+      beforeLevel: 78 + (i % 21),
+      afterLevel: st === 'confirmed' ? (4 + (i % 10)) : st === 'partial' ? 34 : 84,
+      status: st, km, cost: km * 450,
+      evidence: st === 'confirmed' ? ['QR Code', 'Sensor IoT', 'GPS Motorista'] : ['Sensor IoT', 'GPS Motorista'],
+    });
+  }
+
+  const alerts = containers.filter(c => c.fillLevel >= 75).map((c, i) => ({
+    id: 'AL-' + String(i + 1).padStart(4, '0'),
+    type: c.fillLevel >= 90 ? 'critical' : 'full',
+    containerId: c.code, containerCode: c.code,
+    message: c.fillLevel >= 90
+      ? `${c.code} (${c.street}) em nível crítico (${c.fillLevel}%)`
+      : `${c.code} (${c.street}) cheio (${c.fillLevel}%)`,
+    severity: c.fillLevel >= 90 ? 'high' : 'medium',
+    timestamp: new Date(Date.now() - (i + 1) * 1800e3).toISOString(),
+    read: false,
+  }));
+
+  const citizenReports = [
+    {
+      id: 'CID-001',
+      containerCode: 'KL-0001',
+      province: 'Luanda',
+      location: 'Viana — Rua Dr. Agostinho Neto - Viana',
+      category: 'Transbordo de resíduos',
+      description: 'Contentor no limite da capacidade junto à paragem principal.',
+      photoTag: 'Foto #AO-9012 (Georreferenciada)',
+      reporter: 'Munícipe (+244 923 881 200)',
+      timestamp: new Date(Date.now() - 40 * 60e3).toISOString(),
+      status: 'pending',
+    },
+    {
+      id: 'CID-002',
+      containerCode: 'KL-0003',
+      province: 'Luanda',
+      location: 'Zango 3 — Rua Direita do Zango 3',
+      category: 'Fumo / risco de incêndio',
+      description: 'Descarte de cinzas quentes detetado pelo sensor térmico (49°C).',
+      photoTag: 'Foto #AO-9015 (Fiscalização)',
+      reporter: 'Comissão de Moradores Zango 3',
+      timestamp: new Date(Date.now() - 2 * 3600e3).toISOString(),
+      status: 'dispatched',
+    },
+    {
+      id: 'CID-003',
+      containerCode: 'KL-0008',
+      province: 'Luanda',
+      location: 'Belas — Av. Imperial Santana - Kilamba',
+      category: 'Pedido de recolha extraordinária',
+      description: 'Aumento de resíduos após mercado comunitário.',
+      photoTag: 'Foto #AO-8994',
+      reporter: 'Administração Bloco F - Kilamba',
+      timestamp: new Date(Date.now() - 5 * 3600e3).toISOString(),
+      status: 'resolved',
+    },
+  ];
+
+  const users = [
+    { id: 'U-01', name: 'Eng. João Salvador', email: 'admin@kiela.ao',      role: 'admin',      org: 'Kiela Operações Angola', status: 'active' },
+    { id: 'U-02', name: 'Ana Paula Ferreira', email: 'supervisor@kiela.ao', role: 'supervisor', org: 'Supervisão Viana & Belas', status: 'active' },
+    { id: 'U-03', name: 'Carlos Manuel',      email: 'motorista@kiela.ao',  role: 'driver',     org: 'Frota Municipal Luanda', status: 'active' },
+  ];
+
+  const esgGenerators = [
+    {
+      id: 'GG-001',
+      name: 'Fábrica Refriango - Polo Viana',
+      nif: '5401184920',
+      province: 'Luanda',
+      municipality: 'Viana',
+      wasteType: 'Plástico/PET & Papel/Cartão',
+      monthlyKg: 34200,
+      recoveryRate: 93,
+      status: 'Certificado Ouro',
+      destination: 'Unidade de Valorização Polímeros Angola (Viana)',
+      lastCertDate: new Date(Date.now() - 2 * 86400e3).toISOString(),
+    },
+    {
+      id: 'GG-002',
+      name: 'Hotel Epic Sana Luanda',
+      nif: '5417092814',
+      province: 'Luanda',
+      municipality: 'Ingombota',
+      wasteType: 'Orgânico & Vidro/Metal',
+      monthlyKg: 15400,
+      recoveryRate: 85,
+      status: 'Certificado Ouro',
+      destination: 'Central de Compostagem & Triagem de Viana',
+      lastCertDate: new Date(Date.now() - 3 * 86400e3).toISOString(),
+    },
+    {
+      id: 'GG-003',
+      name: 'Belas Shopping',
+      nif: '5403918274',
+      province: 'Luanda',
+      municipality: 'Talatona',
+      wasteType: 'Papel/Cartão & Plástico/PET',
+      monthlyKg: 22100,
+      recoveryRate: 88,
+      status: 'Certificado Ouro',
+      destination: 'Central de Enfardamento Talatona / Mulenvos',
+      lastCertDate: new Date(Date.now() - 4 * 86400e3).toISOString(),
+    },
+    {
+      id: 'GG-004',
+      name: 'Condomínio Jardim de Rosas',
+      nif: '5419283741',
+      province: 'Luanda',
+      municipality: 'Belas',
+      wasteType: 'Orgânico & Plástico/PET',
+      monthlyKg: 9800,
+      recoveryRate: 78,
+      status: 'Certificado Prata',
+      destination: 'Aterro Sanitário dos Mulenvos / Triagem',
+      lastCertDate: new Date(Date.now() - 6 * 86400e3).toISOString(),
+    },
+  ];
+
+  const ecoPointTx = [
+    {
+      id: 'ECO-204',
+      citizen: '+244 923 418 902 (Marta K.)',
+      containerCode: 'KL-0001',
+      location: 'Viana — Rua Dr. Agostinho Neto - Viana',
+      material: 'Plástico PET',
+      weightKg: 9.0,
+      points: 450,
+      timestamp: new Date(Date.now() - 30 * 60e3).toISOString(),
+    },
+    {
+      id: 'ECO-203',
+      citizen: '+244 931 702 114 (Paulo D.)',
+      containerCode: 'KL-0008',
+      location: 'Belas — Av. Imperial Santana - Kilamba',
+      material: 'Alumínio',
+      weightKg: 5.0,
+      points: 400,
+      timestamp: new Date(Date.now() - 2 * 3600e3).toISOString(),
+    },
+    {
+      id: 'ECO-202',
+      citizen: '+244 924 559 830 (Teresa M.)',
+      containerCode: 'KL-0004',
+      location: 'Ingombota — Av. Murtala Mohamed',
+      material: 'Vidro',
+      weightKg: 14.0,
+      points: 420,
+      timestamp: new Date(Date.now() - 4 * 3600e3).toISOString(),
+    },
+  ];
+
+  return {
+    containers, sensors, vehicles, drivers, collections, alerts, citizenReports, users,
+    esgGenerators, ecoPointTx,
+    settings: { criticalThreshold: 90, fullThreshold: 75, fuelCostPerLiterKz: 300, autoDispatchAi: true },
+    routes: [], auditLog: [], currentUser: null
+  };
+}
+
+/* ============================================================================
+ * 5. COMPONENTES BASE DE UI (IDENTIDADE AFRO-TECNOLÓGICA KIELA)
+ * ========================================================================== */
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white rounded-xl border border-sand-200 shadow-[0_1px_4px_rgba(28,25,23,0.06)] ${className}`}>{children}</div>
+);
+
+const Btn = ({ children, onClick, variant = 'primary', className = '', disabled, type = 'button' }) => {
+  const v = {
+    primary: 'bg-ochre-500 hover:bg-ochre-600 text-white shadow-sm',
+    savanna: 'bg-savanna-600 hover:bg-savanna-700 text-white shadow-sm',
+    dark:    'bg-obsidian-900 hover:bg-obsidian-800 text-white shadow-sm',
+    ghost:   'bg-white border border-sand-200 hover:bg-sand-100 text-obsidian-900',
+    danger:  'bg-terra-600 hover:bg-red-700 text-white',
+  }[variant] || 'bg-ochre-500 text-white';
+  return (
+    <button type={type} onClick={onClick} disabled={disabled}
+      className={`px-3 py-2 rounded-lg text-sm font-semibold transition inline-flex items-center justify-center gap-1.5 ${v} disabled:opacity-50 ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+const Field = ({ label, children }) => (
+  <label className="block text-sm">
+    <span className="text-stone-500 font-semibold text-xs uppercase tracking-wide">{label}</span>
+    <div className="mt-1">{children}</div>
+  </label>
+);
+
+const Input = (p) => (
+  <input {...p} className={`w-full border border-sand-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ochre-500/30 ${p.className || ''}`} />
+);
+
+const Select = (p) => (
+  <select {...p} className={`w-full border border-sand-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ochre-500/30 ${p.className || ''}`} />
+);
+
+const Badge = ({ status }) => {
+  const s = STATUS[status] || { label: status, bg: 'bg-stone-100', text: 'text-stone-700' };
+  return <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${s.bg} ${s.text}`}>{s.label}</span>;
+};
+
+const Modal = ({ open, onClose, title, children, wide }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[2000] bg-obsidian-950/60 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={onClose}>
+      <div className={`bg-white rounded-2xl shadow-2xl border border-sand-200 w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[92vh] overflow-auto animate-fade-up`} onClick={e => e.stopPropagation()}>
+        <div className="afro-ribbon" />
+        <div className="flex items-center justify-between p-4 border-b border-sand-200 sticky top-0 bg-white z-10">
+          <h3 className="font-bold text-obsidian-900">{title}</h3>
+          <button onClick={onClose} className="text-stone-500 hover:text-obsidian-900 p-1 rounded-lg hover:bg-sand-100">
+            <Icon name="close" className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  );
+};
+
+const HeroStatCard = ({ label, value, delta, positive = true, accent = 'ochre', icon, sparkPoints, suffix = '' }) => {
+  const badgeStyle = accent === 'terra'
+    ? 'bg-orange-50 text-terra-600'
+    : accent === 'savanna'
+    ? 'bg-teal-50 text-savanna-600'
+    : 'bg-amber-50 text-ochre-600';
+  const lineColor = accent === 'terra' ? '#c2410c' : accent === 'savanna' ? '#0f766e' : '#d97706';
+  const numColor = accent === 'terra' ? 'text-terra-600' : accent === 'savanna' ? 'text-savanna-600' : 'text-obsidian-900';
+
+  return (
+    <Card className="p-4 animate-fade-up">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">{label}</span>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${badgeStyle}`}>
+          <Icon name={icon} className="w-4 h-4" />
+        </div>
+      </div>
+      <div className="mt-2 flex items-end justify-between gap-2">
+        <div>
+          <p className={`text-2xl sm:text-3xl font-extrabold tabular-nums ${numColor}`}>
+            <AnimatedKPI value={value} suffix={suffix} />
+          </p>
+          {delta && (
+            <p className={`text-[11px] font-semibold mt-1 tabular-nums ${positive ? 'text-savanna-600' : 'text-terra-600'}`}>
+              {delta}
+            </p>
+          )}
+        </div>
+        {sparkPoints && <Sparkline points={sparkPoints} color={lineColor} />}
+      </div>
+    </Card>
+  );
+};
+
+/* ============================================================================
+ * 6. MAPA INTERACTIVO PANORÂMICO (RUAS / SATÉLITE + MARCADORES PERCENTUAIS)
+ * ========================================================================== */
+
+function matchesMapFilters(c, sensors, filters, thresholds) {
+  if (filters.status && filters.status !== 'all' && statusKey(c, sensors, thresholds) !== filters.status) return false;
+  if (filters.province && filters.province !== 'all' && c.province !== filters.province) return false;
+  if (filters.municipality && filters.municipality !== 'all' && c.municipality !== filters.municipality) return false;
+  if (filters.street && filters.street !== 'all' && c.street !== filters.street) return false;
+  return true;
+}
+
+function MapView({
+  containers, sensors, vehicles = [], route, filters = {}, selectedId, onSelect,
+  showVehicles = true, height = '620px', pulseCritical = true, autoFit = true,
+  defaultLayer = 'roadmap', compact = false, overlayTopLeft = null, overlayRight = null,
+  thresholds = { critical: 90, full: 75 }
+}) {
+  const el = useRef(null);
+  const map = useRef(null);
+  const tileLayerRef = useRef(null);
+  const layer = useRef(null);
+  const lastFitKey = useRef('');
+  const [mapType, setMapType] = useState(defaultLayer);
+
+  useEffect(() => {
+    if (!el.current || map.current || typeof L === 'undefined') return;
+    map.current = L.map(el.current, { zoomControl: false }).setView([-8.9024, 13.3728], 12);
+    L.control.zoom({ position: 'bottomright' }).addTo(map.current);
+    layer.current = L.layerGroup().addTo(map.current);
+
+    let ro;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => { if (map.current) map.current.invalidateSize(); });
+      ro.observe(el.current);
+    }
+    const t = setTimeout(() => { if (map.current) map.current.invalidateSize(); }, 200);
+    return () => {
+      clearTimeout(t);
+      if (ro) ro.disconnect();
+      if (map.current) { map.current.remove(); map.current = null; }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!map.current || typeof L === 'undefined') return;
+    if (tileLayerRef.current) { map.current.removeLayer(tileLayerRef.current); tileLayerRef.current = null; }
+
+    if (mapType === 'satellite') {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19, attribution: '© Esri Satélite' }
+      ).addTo(map.current);
+    } else {
+      let switchedToOsm = false;
+      const cleanStreets = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        { subdomains: 'abcd', maxZoom: 19, attribution: '© CartoDB · © OSM' }
+      );
+      cleanStreets.on('tileerror', () => {
+        if (!switchedToOsm && map.current) {
+          switchedToOsm = true;
+          map.current.removeLayer(cleanStreets);
+          tileLayerRef.current = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '© OpenStreetMap'
+          }).addTo(map.current);
+        }
+      });
+      tileLayerRef.current = cleanStreets.addTo(map.current);
+    }
+  }, [mapType]);
+
+  useEffect(() => {
+    if (!map.current || !layer.current) return;
+    setTimeout(() => map.current && map.current.invalidateSize(), 80);
+    layer.current.clearLayers();
+    const visibleCoords = [];
+
+    containers.forEach(c => {
+      if (!matchesMapFilters(c, sensors, filters, thresholds)) return;
+      visibleCoords.push([c.lat, c.lng]);
+      const k = statusKey(c, sensors, thresholds);
+      const isCritical = k === 'critical';
+      const isSel = selectedId === c.id;
+      const bg = STATUS[k].color;
+
+      const pinHtml = `<div class="${(pulseCritical && isCritical) ? 'pulse-pin' : ''}" style="background:${bg};color:#fff;font-weight:800;font-size:10px;padding:2.5px 8px;border-radius:999px;border:${isSel ? '2.5px solid #1c1917' : '2px solid #ffffff'};box-shadow:0 2px 6px rgba(0,0,0,0.32);white-space:nowrap;transform:${isSel ? 'scale(1.16)' : 'scale(1)'}">${c.fillLevel}%</div>`;
+      const m = L.marker([c.lat, c.lng], {
+        icon: L.divIcon({ html: pinHtml, className: '', iconSize: [42, 22], iconAnchor: [21, 11] })
+      });
+      m.bindPopup(`<b>${c.code}</b> · <b>${c.fillLevel}%</b><br/>${c.street}`);
+      m.on('click', () => onSelect && onSelect(c.id));
+      layer.current.addLayer(m);
+    });
+
+    if (showVehicles) {
+      vehicles.forEach(v => {
+        const bg = v.status === 'maintenance' ? '#c2410c' : '#1c1917';
+        const html = `<div style="background:${bg};color:#fbbf24;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:2px solid #fbbf24;box-shadow:0 2px 6px rgba(0,0,0,.35)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="15" height="12" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>`;
+        L.marker([v.lat, v.lng], { icon: L.divIcon({ html, className: '', iconSize: [28, 28], iconAnchor: [14, 14] }) })
+          .bindPopup(`<b>${v.plate}</b> · ${v.type}`).addTo(layer.current);
+      });
+    }
+
+    if (route && route.stops && route.stops.length) {
+      const stopCoords = route.stops.map(s => [s.lat, s.lng]);
+      L.polyline(stopCoords, { color: '#0f766e', weight: 4, dashArray: '8 6' }).addTo(layer.current);
+      route.stops.forEach((s, i) => {
+        const html = `<div style="background:${s.done ? '#0f766e' : '#d97706'};color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid #fff;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,.3)">${s.done ? '✓' : i + 1}</div>`;
+        L.marker([s.lat, s.lng], { icon: L.divIcon({ html, className: '', iconSize: [24, 24], iconAnchor: [12, 12] }) })
+          .bindPopup(`<b>${i + 1}. ${s.code}</b> (${s.fillLevel}%)<br/>${s.street}`).addTo(layer.current);
+      });
+      if (autoFit && stopCoords.length) {
+        const rKey = 'route-' + route.stops.map(s => s.id).join(',');
+        if (lastFitKey.current !== rKey) {
+          lastFitKey.current = rKey;
+          try { map.current.fitBounds(L.latLngBounds(stopCoords), { padding: [45, 45], maxZoom: 14 }); } catch (e) {}
+        }
+      }
+    } else if (autoFit && visibleCoords.length && !selectedId) {
+      const fKey = `${filters.province || 'all'}-${filters.municipality || 'all'}-${filters.street || 'all'}-${filters.status || 'all'}`;
+      if (lastFitKey.current !== fKey) {
+        lastFitKey.current = fKey;
+        try {
+          if (visibleCoords.length === 1) {
+            map.current.setView(visibleCoords[0], 16);
+          } else if (filters.province && filters.province !== 'all') {
+            map.current.fitBounds(L.latLngBounds(visibleCoords), { padding: [45, 45], maxZoom: 14 });
+          } else {
+            map.current.setView([-10.5, 14.5], 6);
+          }
+        } catch (e) {}
+      }
+    }
+  }, [containers, sensors, vehicles, route, filters, selectedId, showVehicles, onSelect, pulseCritical, autoFit, thresholds]);
+
+  useEffect(() => {
+    if (!map.current || !selectedId) return;
+    const c = containers.find(x => x.id === selectedId);
+    if (c) map.current.flyTo([c.lat, c.lng], 15, { duration: 0.55 });
+  }, [selectedId, containers]);
+
+  return (
+    <div className="relative overflow-hidden rounded-xl">
+      {overlayTopLeft}
+      {overlayRight}
+
+      <div className="absolute top-3 right-3 z-[450] flex items-center gap-1 bg-white/90 backdrop-blur-md border border-sand-200 rounded-lg p-1 shadow-md">
+        {[
+          { id: 'roadmap',   label: 'Ruas',     icon: 'road' },
+          { id: 'satellite', label: 'Satélite', icon: 'satellite' },
+        ].map(opt => (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => setMapType(opt.id)}
+            className={`px-2.5 py-1 rounded-md text-[11px] font-bold inline-flex items-center gap-1 transition ${
+              mapType === opt.id ? 'bg-obsidian-900 text-ochre-400 shadow-sm' : 'text-obsidian-900 hover:bg-sand-100'
+            }`}
+          >
+            <Icon name={opt.icon} className="w-3 h-3" />
+            <span>{opt.label}</span>
+          </button>
+        ))}
+      </div>
+
+      <div ref={el} style={{ height }} className="w-full rounded-xl z-0" />
+
+      {!compact && (
+        <div className="absolute bottom-3 left-3 z-[400] bg-white/90 backdrop-blur-md border border-sand-200 rounded-lg px-2.5 py-1 text-[11px] shadow flex flex-wrap gap-x-2.5 gap-y-1">
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0f766e]" />Disponível</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#d97706]" />Atenção</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#ea580c]" />Cheio</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#c2410c]" />Crítico (≥90%)</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#78716c]" />Offline</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 7. ECRÃ DE ENTRADA & PERFIS DEMO (RBAC)
+ * ========================================================================== */
+
+function LoginScreen({ onLogin }) {
+  const [email, setEmail] = useState('admin@kiela.ao');
+  const [pwd, setPwd] = useState('kiela2026');
+  const quickProfiles = [
+    { label: 'Administrador', sub: 'Acesso total',   email: 'admin@kiela.ao',      icon: 'shield' },
+    { label: 'Supervisor',    sub: 'Frota e Rotas',  email: 'supervisor@kiela.ao', icon: 'route' },
+    { label: 'Motorista',     sub: 'App de Recolha', email: 'motorista@kiela.ao',  icon: 'truck' },
+  ];
+
+  return (
+    <div className="min-h-screen flex items-center justify-center samakaka-bg p-4 relative">
+      <div className="fixed top-0 left-0 right-0 afro-ribbon z-50" />
+      <Card className="w-full max-w-md overflow-hidden animate-fade-up border-stone-700/40">
+        <div className="afro-ribbon" />
+        <div className="p-8">
+          <div className="text-center mb-6">
+            <div className="mx-auto w-fit"><KielaLogo size={62} /></div>
+            <h1 className="text-3xl font-extrabold text-obsidian-900 mt-3 tracking-tight">Kiela</h1>
+            <p className="text-xs font-bold uppercase tracking-wider text-ochre-600 mt-0.5">
+              Inteligência Urbana &amp; Economia Circular
+            </p>
+            <p className="text-xs text-stone-500 mt-1">
+              Do Kimbundu <em>&ldquo;ku-yela&rdquo;</em> — limpar, purificar, tornar claro
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Btn variant="primary" className="w-full py-3 font-bold text-sm shadow-md" onClick={() => onLogin('admin@kiela.ao')}>
+              <Icon name="play" className="w-4 h-4" />
+              <span>Entrar como Administrador (Demo)</span>
+            </Btn>
+
+            <div className="relative flex py-2 items-center">
+              <div className="flex-grow border-t border-sand-200" />
+              <span className="flex-shrink mx-3 text-[11px] uppercase tracking-wider text-stone-400 font-semibold">Ou acesso institucional</span>
+              <div className="flex-grow border-t border-sand-200" />
+            </div>
+
+            <Field label="Email Institucional"><Input value={email} onChange={e => setEmail(e.target.value)} /></Field>
+            <Field label="Palavra-passe"><Input type="password" value={pwd} onChange={e => setPwd(e.target.value)} /></Field>
+            <Btn variant="dark" className="w-full py-2.5" onClick={() => onLogin(email)}>Iniciar Sessão</Btn>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-sand-200">
+            <p className="text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2.5 text-center">Alternar Perfil de Demonstração</p>
+            <div className="grid grid-cols-3 gap-2">
+              {quickProfiles.map(p => (
+                <button key={p.email} onClick={() => onLogin(p.email)}
+                  className="border border-sand-200 hover:border-ochre-500 hover:bg-amber-50/60 rounded-xl p-2.5 text-center transition flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-lg bg-obsidian-900 text-ochre-400 flex items-center justify-center">
+                    <Icon name={p.icon} className="w-4 h-4" />
+                  </div>
+                  <div className="text-xs font-bold text-obsidian-900 mt-1.5">{p.label}</div>
+                  <div className="text-[10px] text-stone-500 leading-tight mt-0.5">{p.sub}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 8. MÓDULO 1 — DASHBOARD EXECUTIVO (COPILOTO IA COMPACTO + 4 HERO KPIS)
+ * ========================================================================== */
+
+function OperationalCopilotBar({ data, setData, logAction, go }) {
+  const toast = useToast();
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState(null);
+
+  const suggestions = [
+    'Previsão em Viana antes das 18h',
+    'Frota disponível em Luanda',
+    'Risco de incêndio / sensores críticos',
+  ];
+
+  const runAnalysis = (rawQuery) => {
+    const q = (rawQuery || prompt).trim();
+    if (!q) return;
+    setPrompt(q);
+    const lower = q.toLowerCase();
+
+    const matchedProv = PROVINCES.find(p => lower.includes(p.toLowerCase()));
+    const matchedMun = [...new Set(data.containers.map(c => c.municipality))].find(m => lower.includes(m.toLowerCase()));
+
+    let pool = data.containers;
+    let scopeLabel = 'Rede Nacional (Angola)';
+    if (matchedMun) {
+      pool = pool.filter(c => c.municipality.toLowerCase() === matchedMun.toLowerCase());
+      scopeLabel = `Município de ${matchedMun}`;
+    } else if (matchedProv) {
+      pool = pool.filter(c => c.province.toLowerCase() === matchedProv.toLowerCase());
+      scopeLabel = `Província de ${matchedProv}`;
+    }
+
+    const risky = pool
+      .map(c => {
+        const rate = c.fillLevel >= 85 ? 6.8 : c.fillLevel >= 65 ? 5.2 : 3.5;
+        const hoursToFull = Math.max(1, Math.round((100 - c.fillLevel) / rate));
+        return { ...c, rate, hoursToFull };
+      })
+      .filter(c => c.fillLevel >= 65)
+      .sort((a, b) => b.fillLevel - a.fillLevel)
+      .slice(0, 4);
+
+    const targetProv = matchedProv || risky[0]?.province || 'Luanda';
+    const availVehicles = data.vehicles.filter(v => v.status === 'available');
+    const recommendedVehicle = availVehicles[0] || data.vehicles[0];
+
+    let headline = `Análise Preditiva Kiela IA — ${scopeLabel}`;
+    let summary = `${risky.length} ponto(s) com risco elevado de saturação antes das 18h.`;
+    if (lower.includes('frota') || lower.includes('viatura')) {
+      headline = 'Disponibilidade Operacional de Frota';
+      summary = `${availVehicles.length} viatura(s) pronta(s) na base (${availVehicles.map(v => v.plate).join(', ') || 'nenhuma livre'}).`;
+    } else if (lower.includes('incêndio') || lower.includes('sensor')) {
+      const hot = data.sensors.filter(s => s.temperatureC >= 40);
+      headline = 'Telemetria Térmica & Segurança IoT';
+      summary = `${hot.length} sensor(es) com anomalia térmica detetada (ex.: Zango 3 a 49°C).`;
+    }
+
+    setResponse({ headline, summary, risky, targetProv, recommendedVehicle });
+  };
+
+  const dispatchFromCopilot = () => {
+    if (!response || !response.recommendedVehicle) return;
+    const v = response.recommendedVehicle;
+    const stops = optimizeRoute(data.containers, data.sensors, v, response.targetProv);
+    if (!stops.length) {
+      toast('Sem paragens ≥50% elegíveis nesta zona.', 'warn');
+      return;
+    }
+    const totalKm = +stops.reduce((acc, s) => acc + (s.distFromPrev || 0), 0).toFixed(1);
+    const route = {
+      id: uid('RT'),
+      vehicleId: v.id,
+      vehiclePlate: v.plate,
+      driverId: v.driverId,
+      createdAt: nowIso(),
+      approvedAt: nowIso(),
+      status: 'approved',
+      totalKm,
+      stops: stops.map(s => ({ ...s, done: false })),
+    };
+    setData(d => ({
+      ...d,
+      routes: [route, ...d.routes],
+      vehicles: d.vehicles.map(x => x.id === v.id ? { ...x, status: 'in_route' } : x),
+    }));
+    logAction('COPILOTO_ROTA', `${route.id} → ${v.plate} (${stops.length} paragens)`);
+    toast(`Rota IA ${route.id} despachada para ${v.plate} (${totalKm} km)`, 'success');
+    go('routes');
+  };
+
+  return (
+    <Card className="p-3 border-l-4 border-l-ochre-500 animate-fade-up">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-2.5">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-amber-50 text-ochre-600 flex items-center justify-center">
+            <Icon name="spark" className="w-4 h-4" />
+          </div>
+          <span className="text-xs font-extrabold text-obsidian-900 uppercase tracking-wide">Copiloto IA</span>
+        </div>
+
+        <div className="flex-1 flex gap-2">
+          <Input
+            className="!py-1.5"
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') runAnalysis(prompt); }}
+            placeholder="Pergunte sobre saturação em Viana, Belas, frota disponível ou alertas térmicos..."
+          />
+          <Btn variant="primary" className="!py-1.5 !px-3" onClick={() => runAnalysis(prompt)}>
+            <Icon name="send" className="w-3.5 h-3.5" />
+            <span>Analisar</span>
+          </Btn>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {suggestions.map((s, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => runAnalysis(s)}
+              className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-sand-100 hover:bg-obsidian-900 hover:text-ochre-400 text-obsidian-900 transition"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {response && (
+        <div className="mt-3 pt-3 border-t border-sand-200 space-y-2.5 animate-fade-up">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs font-bold text-obsidian-900">{response.headline}</p>
+              <p className="text-xs text-stone-600">{response.summary}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {response.recommendedVehicle && (
+                <Btn variant="savanna" className="!text-xs !py-1.5" onClick={dispatchFromCopilot}>
+                  <Icon name="route" className="w-3.5 h-3.5" />
+                  <span>Despachar Rota IA ({response.recommendedVehicle.plate})</span>
+                </Btn>
+              )}
+              <button onClick={() => setResponse(null)} className="text-xs text-stone-500 hover:text-obsidian-900 px-2 py-1">Fechar</button>
+            </div>
+          </div>
+
+          {response.risky.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {response.risky.map(c => (
+                <div key={c.id} className="bg-sand-50 border border-sand-200 rounded-lg p-2.5 text-xs tabular-nums">
+                  <div className="flex justify-between font-bold text-obsidian-900">
+                    <span>{c.code}</span>
+                    <span className={c.fillLevel >= 90 ? 'text-terra-600' : 'text-ochre-600'}>{c.fillLevel}%</span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 truncate mt-0.5">{c.street}</p>
+                  <p className="text-[10px] font-semibold text-savanna-600 mt-1">
+                    +{c.rate}%/h · 100% em ~{c.hoursToFull}h
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function Dashboard({ data, setData, logAction, go, onMarkAllAlertsRead, onInspectContainer }) {
+  const { containers, sensors, vehicles, collections, alerts, settings } = data;
+  const thresholds = { critical: settings?.criticalThreshold || 90, full: settings?.fullThreshold || 75 };
+  const byStatus = s => containers.filter(c => statusKey(c, sensors, thresholds) === s).length;
+  const done = collections.filter(c => c.status === 'confirmed' || c.status === 'partial').length;
+  const avail = vehicles.filter(v => v.status === 'available').length;
+  const unread = alerts.filter(a => !a.read).length;
+  const totalSavedKz = vehicles.reduce((acc, v) => acc + (v.fuelSavedKz || 0), 0);
+
+  const statusData = Object.keys(STATUS).map(k => ({ name: STATUS[k].label, value: byStatus(k), key: k })).filter(d => d.value > 0);
+  const byProvince = {};
+  containers.forEach(c => byProvince[c.province] = (byProvince[c.province] || 0) + 1);
+  const provinceData = Object.entries(byProvince).map(([name, value]) => ({ name, value }));
+
+  return (
+    <div className="space-y-4">
+      <OperationalCopilotBar data={data} setData={setData} logAction={logAction} go={go} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <HeroStatCard label="Contentores Activos" value={containers.length} delta="100% telemetria LoRaWAN" accent="ochre" icon="trash" sparkPoints={[14, 15, 16, 16, 17, 18, containers.length]} />
+        <HeroStatCard label={`Críticos (≥${thresholds.critical}%)`} value={byStatus('critical')} delta={`${byStatus('full')} em nível cheio`} positive={false} accent="terra" icon="alert" sparkPoints={[3, 4, 5, 4, 6, 5, byStatus('critical')]} />
+        <HeroStatCard label="Poupança Combustível" value={Math.round(totalSavedKz / 1000)} suffix=" mil Kz" delta="-28% km rodados (30d)" accent="savanna" icon="coin" sparkPoints={[820, 940, 1050, 1180, 1290, 1380, Math.round(totalSavedKz / 1000)]} />
+        <HeroStatCard label="Recolhas Auditadas" value={done} delta={`${avail}/${vehicles.length} viaturas livres`} accent="savanna" icon="check" sparkPoints={[10, 12, 14, 16, 18, 20, done]} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="p-4 animate-fade-up">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-obsidian-900 text-sm">Alertas Críticos &amp; Térmicos ({unread})</h3>
+            {unread > 0 && <button onClick={onMarkAllAlertsRead} className="text-xs font-semibold text-ochre-600 hover:underline">Marcar lidos</button>}
+          </div>
+          <div className="divide-y divide-sand-100 max-h-[250px] overflow-auto">
+            {alerts.slice(0, 7).map(a => (
+              <div key={a.id} onClick={() => onInspectContainer && onInspectContainer(a.containerId)}
+                className={`py-2.5 flex items-start gap-2.5 cursor-pointer hover:bg-sand-50 rounded-lg px-1.5 transition ${a.read ? 'opacity-60' : ''}`}>
+                <span className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${a.severity === 'high' ? 'bg-terra-600' : 'bg-ochre-500'}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-obsidian-900 leading-snug">{a.message}</p>
+                  <p className="text-[10px] text-stone-500 mt-0.5 tabular-nums">{fmtDate(a.timestamp)} · Clique para auditar</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-4 animate-fade-up">
+          <h3 className="font-bold text-obsidian-900 text-sm mb-3">Distribuição por Estado</h3>
+          <div style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={statusData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={82} paddingAngle={2}>
+                  {statusData.map((d, i) => <Cell key={i} fill={STATUS[d.key].color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="p-4 animate-fade-up">
+          <h3 className="font-bold text-obsidian-900 text-sm mb-3">Cobertura por Província</h3>
+          <div style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={provinceData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Bar dataKey="value" fill="#d97706" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 9. MÓDULO 2 — MAPA INTELIGENTE PANORÂMICO (GAVETAS GLASSMORPHISM)
+ * ========================================================================== */
+
+function MapModule({ data, selectContainer }) {
+  const [prov, setProv] = useState('Luanda');
+  const [mun, setMun] = useState('Viana');
+  const [street, setStreet] = useState('all');
+  const [status, setStatus] = useState('all');
+  const [selectedId, setSelectedId] = useState('KL-0001');
+  const [showVehicles, setShowVehicles] = useState(true);
+  const thresholds = { critical: data.settings?.criticalThreshold || 90, full: data.settings?.fullThreshold || 75 };
+
+  const provinces = useMemo(() => [...new Set(data.containers.map(c => c.province))], [data.containers]);
+  const municipalities = useMemo(() => {
+    const list = prov === 'all' ? data.containers : data.containers.filter(c => c.province === prov);
+    return [...new Set(list.map(c => c.municipality))];
+  }, [data.containers, prov]);
+
+  const streets = useMemo(() => {
+    let list = data.containers;
+    if (prov !== 'all') list = list.filter(c => c.province === prov);
+    if (mun !== 'all') list = list.filter(c => c.municipality === mun);
+    return [...new Set(list.map(c => c.street))];
+  }, [data.containers, prov, mun]);
+
+  const filteredContainers = useMemo(() => {
+    return data.containers.filter(c => matchesMapFilters(c, data.sensors, { province: prov, municipality: mun, street, status }, thresholds));
+  }, [data.containers, data.sensors, prov, mun, street, status, thresholds]);
+
+  const selectedContainer = useMemo(
+    () => data.containers.find(c => c.id === selectedId) || filteredContainers[0] || null,
+    [data.containers, selectedId, filteredContainers]
+  );
+
+  const selectedSensor = useMemo(
+    () => selectedContainer ? data.sensors.find(s => s.id === selectedContainer.sensorId) : null,
+    [selectedContainer, data.sensors]
+  );
+
+  const floatingFilters = (
+    <div className="absolute top-3 left-3 z-[450] bg-white/92 backdrop-blur-md border border-sand-200 rounded-xl p-2.5 shadow-lg max-w-[calc(100%-190px)] flex flex-wrap items-center gap-2">
+      <Select className="!py-1 !text-xs !w-auto min-w-[115px]" value={prov} onChange={e => { setProv(e.target.value); setMun('all'); setStreet('all'); setSelectedId(null); }}>
+        <option value="all">Províncias ({provinces.length})</option>
+        {provinces.map(p => <option key={p}>{p}</option>)}
+      </Select>
+      <Select className="!py-1 !text-xs !w-auto min-w-[115px]" value={mun} onChange={e => { setMun(e.target.value); setStreet('all'); setSelectedId(null); }}>
+        <option value="all">Municípios ({municipalities.length})</option>
+        {municipalities.map(m => <option key={m}>{m}</option>)}
+      </Select>
+      <Select className="!py-1 !text-xs !w-auto min-w-[175px]" value={street} onChange={e => {
+        const val = e.target.value;
+        setStreet(val);
+        if (val !== 'all') {
+          const hit = data.containers.find(c => c.street === val);
+          if (hit) setSelectedId(hit.id);
+        } else {
+          setSelectedId(null);
+        }
+      }}>
+        <option value="all">Todas as ruas ({streets.length})</option>
+        {streets.map(s => <option key={s}>{s}</option>)}
+      </Select>
+      <Select className="!py-1 !text-xs !w-auto min-w-[115px]" value={status} onChange={e => { setStatus(e.target.value); setSelectedId(null); }}>
+        <option value="all">Estado: Todos</option>
+        {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+      </Select>
+      <label className="flex items-center gap-1.5 text-[11px] font-bold text-obsidian-900 px-1.5 cursor-pointer select-none">
+        <input type="checkbox" checked={showVehicles} onChange={e => setShowVehicles(e.target.checked)} className="rounded" />
+        <span>Frota</span>
+      </label>
+    </div>
+  );
+
+  const floatingDrawer = (
+    <div className="hidden lg:flex flex-col absolute top-14 right-3 bottom-3 w-76 z-[440] bg-white/92 backdrop-blur-md border border-sand-200 rounded-xl shadow-xl p-3">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-bold text-obsidian-900 text-xs uppercase tracking-wider">Pontos Monitorizados</h3>
+        <span className="text-[11px] bg-obsidian-900 text-ochre-400 px-2 py-0.5 rounded-full font-bold tabular-nums">{filteredContainers.length}</span>
+      </div>
+
+      <div className="space-y-1.5 overflow-y-auto flex-1 pr-1">
+        {filteredContainers.map(c => {
+          const st = statusKey(c, data.sensors, thresholds);
+          const active = selectedContainer?.id === c.id;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setSelectedId(c.id)}
+              className={`w-full text-left p-2 rounded-lg border transition ${
+                active ? 'border-ochre-500 bg-amber-50/80' : 'border-sand-200 bg-white/80 hover:bg-white'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-extrabold text-obsidian-900 tabular-nums">{c.code}</span>
+                <span className="text-[11px] font-extrabold tabular-nums" style={{ color: STATUS[st].color }}>{c.fillLevel}%</span>
+              </div>
+              <p className="text-xs font-semibold text-obsidian-800 truncate mt-0.5">{c.street}</p>
+              <p className="text-[10px] text-stone-500">{c.municipality} · {c.province}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      {selectedContainer && (
+        <div className="mt-2.5 pt-2.5 border-t border-sand-200 space-y-2">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-xs text-obsidian-900">{selectedContainer.code}</span>
+              <Badge status={statusKey(selectedContainer, data.sensors, thresholds)} />
+            </div>
+            <p className="text-xs font-semibold text-obsidian-800 mt-0.5">{selectedContainer.street}</p>
+            <p className="text-[11px] text-stone-500">{selectedContainer.neighborhood}</p>
+            {selectedSensor && (
+              <div className="grid grid-cols-3 gap-1 mt-1.5 text-[10px] tabular-nums bg-sand-50 p-1.5 rounded-lg border border-sand-200">
+                <div><span className="text-stone-400 block">Temp.</span><b className={selectedSensor.temperatureC >= 40 ? 'text-terra-600' : 'text-obsidian-900'}>{selectedSensor.temperatureC}°C</b></div>
+                <div><span className="text-stone-400 block">Inclinação</span><b>{selectedSensor.tiltStatus}</b></div>
+                <div><span className="text-stone-400 block">Bateria</span><b className="text-savanna-600">{selectedSensor.battery}%</b></div>
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <a href={buildGoogleMapsDirectionsUrl([selectedContainer])} target="_blank" rel="noopener noreferrer"
+              className="px-2 py-1.5 rounded-lg text-[11px] font-bold bg-obsidian-900 text-ochre-400 text-center hover:bg-obsidian-800">
+              Navegar GPS
+            </a>
+            <button type="button" onClick={() => selectContainer(selectedContainer.id)}
+              className="px-2 py-1.5 rounded-lg text-[11px] font-bold bg-savanna-600 text-white hover:bg-savanna-700">
+              Ficha &amp; QR
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <Card className="p-1.5">
+      <MapView
+        containers={data.containers}
+        sensors={data.sensors}
+        vehicles={data.vehicles}
+        filters={{ province: prov, municipality: mun, street, status }}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        showVehicles={showVehicles}
+        height="635px"
+        thresholds={thresholds}
+        overlayTopLeft={floatingFilters}
+        overlayRight={floatingDrawer}
+      />
+    </Card>
+  );
+}
+
+/* ============================================================================
+ * 10. MÓDULO 3 — ROTAS & DESPACHO (BARRAS DE PROGRESSO SEGMENTADAS)
+ * ========================================================================== */
+
+function RoutesModule({ data, setData, logAction }) {
+  const toast = useToast();
+  const availVehicles = data.vehicles.filter(v => v.status !== 'maintenance');
+  const [vehicleId, setVehicleId] = useState(availVehicles[0]?.id || 'V-01');
+  const [targetProv, setTargetProv] = useState('Luanda');
+  const [draftStops, setDraftStops] = useState([]);
+
+  const generatePlan = () => {
+    const v = data.vehicles.find(x => x.id === vehicleId);
+    if (!v) return;
+    const stops = optimizeRoute(data.containers, data.sensors, v, targetProv);
+    setDraftStops(stops);
+    if (!stops.length) toast('Sem contentores ≥50% elegíveis nesta província.', 'warn');
+    else toast(`Rota calculada com ${stops.length} paragens prioritárias`, 'info');
+  };
+
+  const dispatchPlan = () => {
+    const v = data.vehicles.find(x => x.id === vehicleId);
+    if (!v || !draftStops.length) return;
+    const totalKm = +draftStops.reduce((acc, s) => acc + (s.distFromPrev || 0), 0).toFixed(1);
+    const route = {
+      id: uid('RT'),
+      vehicleId: v.id,
+      vehiclePlate: v.plate,
+      driverId: v.driverId,
+      createdAt: nowIso(),
+      approvedAt: nowIso(),
+      status: 'approved',
+      totalKm,
+      stops: draftStops.map(s => ({ ...s, done: false })),
+    };
+    setData(d => ({
+      ...d,
+      routes: [route, ...d.routes],
+      vehicles: d.vehicles.map(x => x.id === v.id ? { ...x, status: 'in_route' } : x),
+    }));
+    logAction('DESPACHO_ROTA', `${route.id} → ${v.plate} (${totalKm} km)`);
+    toast(`Rota ${route.id} enviada para o motorista (${v.plate})`, 'success');
+    setDraftStops([]);
+  };
+
+  const activeRoute = data.routes.find(r => r.status === 'approved') || null;
+  const mapRoute = draftStops.length ? { stops: draftStops } : activeRoute;
+  const stopsList = mapRoute?.stops || [];
+  const nextPendingIdx = stopsList.findIndex(s => !s.done);
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+        <Field label="Viatura Operacional">
+          <Select value={vehicleId} onChange={e => setVehicleId(e.target.value)}>
+            {availVehicles.map(v => <option key={v.id} value={v.id}>{v.plate} — {v.type}</option>)}
+          </Select>
+        </Field>
+        <Field label="Jurisdição / Província">
+          <Select value={targetProv} onChange={e => setTargetProv(e.target.value)}>
+            <option value="all">Todas as Províncias</option>
+            {[...new Set(data.containers.map(c => c.province))].map(p => <option key={p}>{p}</option>)}
+          </Select>
+        </Field>
+        <Btn variant="primary" onClick={generatePlan}>
+          <Icon name="route" className="w-4 h-4" />
+          <span>Optimizar Rota VRP</span>
+        </Btn>
+        <Btn variant="savanna" onClick={dispatchPlan} disabled={!draftStops.length}>
+          <Icon name="send" className="w-4 h-4" />
+          <span>Aprovar &amp; Despachar ({draftStops.length})</span>
+        </Btn>
+      </Card>
+
+      {stopsList.length > 0 && (
+        <Card className="p-3.5 tabular-nums">
+          <div className="flex items-center justify-between text-xs mb-2">
+            <span className="font-bold text-obsidian-900">Progresso Segmentado por Paragem</span>
+            <span className="text-stone-500">{stopsList.filter(s => s.done).length} de {stopsList.length} concluídas</span>
+          </div>
+          <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${stopsList.length}, minmax(0, 1fr))` }}>
+            {stopsList.map((s, idx) => (
+              <div key={s.id + '-seg-' + idx} title={`${idx + 1}. ${s.code} (${s.fillLevel}%)`}
+                className={`h-2.5 rounded-full transition-all ${
+                  s.done ? 'bg-savanna-600' : idx === nextPendingIdx ? 'bg-ochre-500 animate-pulse' : 'bg-sand-200'
+                }`}
+              />
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="p-2 lg:col-span-2">
+          <MapView containers={data.containers} sensors={data.sensors} vehicles={data.vehicles} route={mapRoute} height="430px" />
+        </Card>
+        <Card className="p-4 space-y-2.5 max-h-[450px] overflow-auto tabular-nums">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-obsidian-900 text-sm">
+              {draftStops.length ? 'Plano Calculado' : activeRoute ? `Rota Activa (${activeRoute.id})` : 'Sequência de Paragens'}
+            </h3>
+            {stopsList.length > 0 && (
+              <a href={buildGoogleMapsDirectionsUrl(stopsList)} target="_blank" rel="noopener noreferrer"
+                className="text-xs font-bold text-ochre-600 hover:underline inline-flex items-center gap-1">
+                <Icon name="compass" className="w-3.5 h-3.5" />
+                <span>GPS</span>
+              </a>
+            )}
+          </div>
+          {stopsList.map((s, i) => (
+            <div key={s.id + '-' + i} className={`border rounded-lg p-2.5 text-xs flex items-center justify-between ${s.done ? 'border-savanna-600/30 bg-teal-50/40' : 'border-sand-200'}`}>
+              <div>
+                <p className="font-bold text-obsidian-900">{i + 1}. {s.code} ({s.fillLevel}%)</p>
+                <p className="text-stone-600">{s.street} · {s.municipality}</p>
+              </div>
+              <span className="font-bold text-ochre-600">{s.distFromPrev || 0} km</span>
+            </div>
+          ))}
+          {stopsList.length === 0 && (
+            <div className="text-center py-8 space-y-2">
+              <p className="text-xs text-stone-500">Nenhuma rota gerada para esta selecção.</p>
+              <Btn variant="primary" className="!text-xs" onClick={generatePlan}>Calcular Agora</Btn>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 11. MÓDULO 4 — APP MOTORISTA (EXECUÇÃO & VALIDAÇÃO QR CODE)
+ * ========================================================================== */
+
+function DriverModule({ data, setData, updateContainer, addAlert, logAction }) {
+  const toast = useToast();
+  const route = data.routes.find(r => r.status === 'approved') || data.routes[0];
+  const [qrValidatedMap, setQrValidatedMap] = useState({});
+
+  if (!route) {
+    return (
+      <Card className="p-8 text-center space-y-3 max-w-lg mx-auto">
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 text-ochre-600 flex items-center justify-center mx-auto">
+          <Icon name="truck" className="w-6 h-6" />
+        </div>
+        <h3 className="font-bold text-obsidian-900">Nenhuma ordem de serviço activa</h3>
+        <p className="text-xs text-stone-500">Despache uma rota no módulo <b>Rotas &amp; Despacho</b> ou use o <b>Copiloto IA</b> no Dashboard.</p>
+      </Card>
+    );
+  }
+
+  const assignedVehicle = data.vehicles.find(v => v.id === route.vehicleId);
+
+  const scanQrCode = (stopId, code) => {
+    setQrValidatedMap(prev => ({ ...prev, [stopId]: true }));
+    toast(`QR Code ${code} validado com sucesso!`, 'success');
+  };
+
+  const finishStop = (i) => {
+    const stop = route.stops[i];
+    if (!stop || stop.done) return;
+    const liveContainer = data.containers.find(x => x.id === stop.id) || stop;
+    const before = liveContainer.fillLevel;
+    const after = Math.max(4, Math.round(before * 0.07));
+    const hasQr = !!qrValidatedMap[stop.id];
+    const collection = {
+      id: uid('REC'),
+      containerId: liveContainer.code,
+      containerCode: liveContainer.code,
+      vehicleId: route.vehicleId,
+      vehiclePlate: route.vehiclePlate,
+      driverId: route.driverId,
+      municipality: liveContainer.municipality,
+      province: liveContainer.province,
+      destination: 'Aterro Sanitário dos Mulenvos',
+      timestamp: nowIso(),
+      beforeLevel: before,
+      afterLevel: after,
+      status: 'confirmed',
+      km: Math.round(stop.distFromPrev || 5),
+      cost: Math.round((stop.distFromPrev || 5) * 450),
+      evidence: [hasQr ? 'QR Code' : 'QR Auto', 'Sensor IoT', 'GPS Motorista'],
+    };
+
+    const updatedStops = route.stops.map((s, idx) => idx === i ? { ...s, done: true } : s);
+    const allDone = updatedStops.every(s => s.done);
+
+    updateContainer(liveContainer.id, { fillLevel: after, lastCollectionAt: nowIso() });
+    setData(d => ({
+      ...d,
+      collections: [collection, ...d.collections],
+      routes: d.routes.map(r => r.id === route.id ? { ...r, stops: updatedStops, status: allDone ? 'completed' : 'approved' } : r),
+      vehicles: allDone ? d.vehicles.map(v => v.id === route.vehicleId ? { ...v, status: 'available' } : v) : d.vehicles,
+    }));
+    logAction('RECOLHA_AUDITADA', `${liveContainer.code} (${before}%→${after}%) → Mulenvos`);
+    toast(`Recolha auditada: ${liveContainer.code} (${before}% → ${after}%)`, 'success');
+  };
+
+  const reportIssue = (i) => {
+    const stop = route.stops[i];
+    if (!stop) return;
+    addAlert({
+      type: 'occurrence', containerId: stop.code, containerCode: stop.code,
+      message: `Ocorrência reportada pelo motorista em ${stop.code} (${stop.street})`,
+      severity: 'high', read: false
+    });
+    logAction('OCORRENCIA_MOTORISTA', stop.code);
+    toast(`Ocorrência enviada à central (${stop.code})`, 'warn');
+  };
+
+  const pendingStops = route.stops.filter(s => !s.done);
+  const doneCount = route.stops.filter(s => s.done).length;
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-4 tabular-nums">
+      <Card className="p-4 samakaka-bg text-white flex flex-wrap items-center justify-between gap-3 border-0">
+        <div>
+          <p className="text-xs text-ochre-400 font-bold uppercase">Terminal Operador · {route.id}</p>
+          <h3 className="text-lg font-extrabold">{route.vehiclePlate} · {assignedVehicle?.type}</h3>
+          <p className="text-xs text-stone-300">{doneCount}/{route.stops.length} paragens auditadas · {route.totalKm} km · Destino: Aterro dos Mulenvos</p>
+        </div>
+        {pendingStops.length > 0 && (
+          <a href={buildGoogleMapsDirectionsUrl(pendingStops, assignedVehicle)} target="_blank" rel="noopener noreferrer"
+            className="px-3.5 py-2 rounded-lg text-xs font-bold bg-ochre-500 hover:bg-ochre-600 text-white inline-flex items-center gap-1.5 shadow">
+            <Icon name="compass" className="w-4 h-4" />
+            <span>Navegar Rota</span>
+          </a>
+        )}
+      </Card>
+
+      <div className="space-y-2.5">
+        {route.stops.map((s, i) => {
+          const qrOk = !!qrValidatedMap[s.id];
+          return (
+            <Card key={s.id + '-' + i} className={`p-4 flex flex-wrap items-center justify-between gap-3 ${s.done ? 'opacity-65 bg-teal-50/40' : ''}`}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-obsidian-900">{i + 1}. {s.code}</span>
+                  <span className="text-xs font-bold text-terra-600">{s.fillLevel}%</span>
+                  {qrOk && !s.done && <span className="text-[11px] font-bold bg-teal-100 text-teal-900 px-2 py-0.5 rounded-full">QR Validado</span>}
+                  {s.done && <span className="text-xs font-bold text-savanna-600">✓ Recolha Auditada</span>}
+                </div>
+                <p className="text-xs font-semibold text-obsidian-800 mt-0.5">{s.street}</p>
+                <p className="text-[11px] text-stone-500">{s.municipality}, {s.province}</p>
+              </div>
+              {!s.done && (
+                <div className="flex flex-wrap gap-2">
+                  <Btn variant={qrOk ? 'ghost' : 'dark'} className="!text-xs" onClick={() => scanQrCode(s.id, s.code)}>
+                    <Icon name="qr" className="w-3.5 h-3.5" />
+                    <span>{qrOk ? 'QR Lido' : 'Ler QR Code'}</span>
+                  </Btn>
+                  <Btn variant="ghost" className="!text-xs" onClick={() => reportIssue(i)}>Ocorrência</Btn>
+                  <Btn variant="savanna" className="!text-xs" onClick={() => finishStop(i)}>Confirmar Recolha</Btn>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 12. MÓDULO 5 — CONTENTORES (INVENTÁRIO, FICHA TÉCNICA & QR CODE)
+ * ========================================================================== */
+
+function ContainersModule({ data, setData, logAction, openDetail, openCreate }) {
+  const toast = useToast();
+  const [q, setQ] = useState('');
+  const [prov, setProv] = useState('all');
+  const thresholds = { critical: data.settings?.criticalThreshold || 90, full: data.settings?.fullThreshold || 75 };
+
+  const filtered = useMemo(() => {
+    return data.containers.filter(c => {
+      if (prov !== 'all' && c.province !== prov) return false;
+      if (q.trim()) {
+        const s = q.toLowerCase();
+        return c.code.toLowerCase().includes(s) || c.street.toLowerCase().includes(s) || c.municipality.toLowerCase().includes(s);
+      }
+      return true;
+    });
+  }, [data.containers, prov, q]);
+
+  const removeContainer = (c) => {
+    setData(d => ({
+      ...d,
+      containers: d.containers.filter(x => x.id !== c.id),
+      sensors: d.sensors.filter(s => s.containerId !== c.id),
+    }));
+    logAction('REMOVER_CONTENTOR', c.code);
+    toast(`Contentor ${c.code} removido`, 'info');
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+          <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Pesquisar código, rua ou município..." className="max-w-xs" />
+          <Select value={prov} onChange={e => setProv(e.target.value)} className="max-w-[180px]">
+            <option value="all">Todas Províncias</option>
+            {[...new Set(data.containers.map(c => c.province))].map(p => <option key={p}>{p}</option>)}
+          </Select>
+        </div>
+        <Btn variant="primary" onClick={openCreate}>
+          <Icon name="plus" className="w-4 h-4" />
+          <span>Novo Contentor</span>
+        </Btn>
+      </Card>
+
+      <Card className="p-4 overflow-auto">
+        <table className="w-full text-sm tabular-nums">
+          <thead className="bg-obsidian-900 text-sand-50">
+            <tr>
+              {['Código', 'Localização Oficial', 'Enchimento', 'Estado', 'Conservação', 'Sensor', 'Acções'].map(h =>
+                <th key={h} className="text-left px-3 py-2.5 font-semibold">{h}</th>)}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-sand-100">
+            {filtered.map(c => {
+              const st = statusKey(c, data.sensors, thresholds);
+              return (
+                <tr key={c.id} className="hover:bg-sand-50 transition">
+                  <td className="px-3 py-2.5 font-extrabold text-obsidian-900">{c.code}</td>
+                  <td className="px-3 py-2.5">
+                    <p className="font-semibold text-obsidian-900">{c.street}</p>
+                    <p className="text-xs text-stone-500">{c.neighborhood} · {c.municipality}, {c.province}</p>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 bg-sand-100 rounded-full h-2 overflow-hidden">
+                        <div className="h-2" style={{ width: c.fillLevel + '%', backgroundColor: STATUS[st].color }} />
+                      </div>
+                      <span className="font-bold text-xs">{c.fillLevel}%</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5"><Badge status={st} /></td>
+                  <td className="px-3 py-2.5 text-xs">{c.conservation}</td>
+                  <td className="px-3 py-2.5 font-mono text-xs">{c.sensorId}</td>
+                  <td className="px-3 py-2.5 whitespace-nowrap space-x-1.5">
+                    <Btn variant="dark" className="!px-2.5 !py-1 !text-xs" onClick={() => openDetail(c.id)}>Ficha &amp; QR</Btn>
+                    <Btn variant="ghost" className="!px-2 !py-1 !text-xs text-terra-600" onClick={() => removeContainer(c)}>Eliminar</Btn>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+function ContainerDetailModal({ data, containerId, onClose }) {
+  const qrRef = useRef(null);
+  const c = data.containers.find(x => x.id === containerId || x.code === containerId);
+  const s = c ? data.sensors.find(x => x.id === c.sensorId) : null;
+
+  useEffect(() => {
+    if (qrRef.current && c) {
+      qrRef.current.innerHTML = '';
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrRef.current, {
+            text: `KIELA-AO:${c.code}|${c.province}|${c.municipality}|${c.lat},${c.lng}`,
+            width: 110,
+            height: 110,
+          });
+        }
+      } catch (e) {}
+    }
+  }, [c]);
+
+  if (!c) return null;
+  const st = statusKey(c, data.sensors);
+  const trendData = [
+    { h: '06h', lvl: Math.max(8, c.fillLevel - 28) },
+    { h: '09h', lvl: Math.max(12, c.fillLevel - 19) },
+    { h: '12h', lvl: Math.max(18, c.fillLevel - 11) },
+    { h: '15h', lvl: Math.max(22, c.fillLevel - 5) },
+    { h: 'Agora', lvl: c.fillLevel },
+  ];
+
+  return (
+    <Modal open={true} onClose={onClose} title={`Ficha Técnica — ${c.code}`} wide>
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-sand-50 border border-sand-200 p-3.5 rounded-xl">
+          <div className="space-y-1 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base font-extrabold text-obsidian-900">{c.code}</span>
+              <Badge status={st} />
+            </div>
+            <p className="text-sm font-bold text-obsidian-800">{c.street}</p>
+            <p className="text-stone-500">{c.neighborhood} · {c.municipality}, Província de {c.province}</p>
+            <p className="font-mono text-[11px] text-stone-500 tabular-nums">GPS: {c.lat.toFixed(5)}, {c.lng.toFixed(5)} · Conservação: {c.conservation}</p>
+            <p className="text-stone-500">Última recolha: {fmtDate(c.lastCollectionAt)}</p>
+          </div>
+          <div className="text-center flex-shrink-0">
+            <div ref={qrRef} className="bg-white p-1.5 rounded-lg border border-sand-200 mx-auto w-fit" />
+            <p className="text-[10px] font-mono text-stone-500 mt-1">QR Auditoria {c.code}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border border-sand-200 rounded-xl p-3">
+            <p className="text-xs font-bold text-obsidian-900 mb-2">Curva de Enchimento (Últimas 12h)</p>
+            <div style={{ height: 180 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                  <XAxis dataKey="h" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="lvl" stroke="#d97706" strokeWidth={2.5} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="border border-sand-200 rounded-xl p-3 space-y-2 text-xs tabular-nums">
+            <p className="font-bold text-obsidian-900">Telemetria Multissensor ({s?.id || '—'})</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-sand-50 p-2 rounded-lg">
+                <span className="text-stone-500 block">Nível Ultrassónico</span>
+                <b className="text-sm text-obsidian-900">{c.fillLevel}%</b>
+              </div>
+              <div className="bg-sand-50 p-2 rounded-lg">
+                <span className="text-stone-500 block">Sensor Térmico</span>
+                <b className={`text-sm ${(s?.temperatureC || 0) >= 40 ? 'text-terra-600' : 'text-obsidian-900'}`}>{s?.temperatureC ?? 30}°C</b>
+              </div>
+              <div className="bg-sand-50 p-2 rounded-lg">
+                <span className="text-stone-500 block">Acelerómetro</span>
+                <b className="text-sm text-obsidian-900">{s?.tiltStatus || 'Estável'}</b>
+              </div>
+              <div className="bg-sand-50 p-2 rounded-lg">
+                <span className="text-stone-500 block">Bateria Solar</span>
+                <b className="text-sm text-savanna-600">{s?.battery ?? 0}%</b>
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-500">Último pacote LoRaWAN: {fmtDate(s?.lastReadingAt)}</p>
+          </div>
+        </div>
+
+        <MapView containers={[c]} sensors={data.sensors} selectedId={c.id} showVehicles={false} height="210px" defaultLayer="satellite" compact />
+
+        <div className="flex flex-wrap justify-between gap-2 pt-2">
+          <a href={buildGoogleMapsPlaceUrl(c.lat, c.lng)} target="_blank" rel="noopener noreferrer"
+            className="px-3 py-2 rounded-lg text-xs font-bold bg-obsidian-900 hover:bg-obsidian-800 text-ochre-400 inline-flex items-center gap-1.5">
+            <Icon name="pin" className="w-3.5 h-3.5" />
+            <span>Abrir no Google Maps</span>
+          </a>
+          <Btn variant="ghost" onClick={onClose}>Fechar</Btn>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function ContainerFormModal({ open, onClose, onCreate, nextCode }) {
+  const toast = useToast();
+  const [form, setForm] = useState({
+    province: 'Luanda',
+    municipality: 'Viana',
+    neighborhood: 'Distrito Urbano de Viana Sede',
+    street: 'Rua Dr. Agostinho Neto - Viana',
+    lat: -8.9035,
+    lng: 13.3740,
+    fillLevel: 20,
+    conservation: 'Bom',
+  });
+
+  if (!open) return null;
+
+  const submit = () => {
+    if (!form.municipality.trim() || !form.street.trim()) {
+      toast('Preencha o município e a rua.', 'warn');
+      return;
+    }
+    onCreate({
+      ...form,
+      lat: Number(form.lat) || -8.9024,
+      lng: Number(form.lng) || 13.3728,
+      fillLevel: Math.min(100, Math.max(0, Number(form.fillLevel) || 0)),
+    });
+    toast(`Contentor ${nextCode} registado com telemetria Kiela`, 'success');
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} title={`Registar Novo Contentor (${nextCode})`} wide>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Field label="Província">
+          <Select value={form.province} onChange={e => setForm({ ...form, province: e.target.value })}>
+            {PROVINCES.map(p => <option key={p}>{p}</option>)}
+          </Select>
+        </Field>
+        <Field label="Município">
+          <Input value={form.municipality} onChange={e => setForm({ ...form, municipality: e.target.value })} />
+        </Field>
+        <Field label="Comuna / Distrito Urbano">
+          <Input value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} />
+        </Field>
+        <Field label="Rua / Via Oficial">
+          <Input value={form.street} onChange={e => setForm({ ...form, street: e.target.value })} />
+        </Field>
+        <Field label="Latitude GPS">
+          <Input type="number" step="0.0001" value={form.lat} onChange={e => setForm({ ...form, lat: e.target.value })} />
+        </Field>
+        <Field label="Longitude GPS">
+          <Input type="number" step="0.0001" value={form.lng} onChange={e => setForm({ ...form, lng: e.target.value })} />
+        </Field>
+        <Field label={`Nível Inicial (${form.fillLevel}%)`}>
+          <Input type="range" min="0" max="100" value={form.fillLevel} onChange={e => setForm({ ...form, fillLevel: Number(e.target.value) })} />
+        </Field>
+        <Field label="Estado de Conservação">
+          <Select value={form.conservation} onChange={e => setForm({ ...form, conservation: e.target.value })}>
+            <option>Bom</option>
+            <option>Razoável</option>
+            <option>Danificado</option>
+          </Select>
+        </Field>
+      </div>
+      <div className="flex justify-end gap-2 mt-4">
+        <Btn variant="ghost" onClick={onClose}>Cancelar</Btn>
+        <Btn variant="savanna" onClick={submit}>Guardar Contentor</Btn>
+      </div>
+    </Modal>
+  );
+}
+
+/* ============================================================================
+ * 13. MÓDULO 6 — SENSORES IOT (ULTRASSÓNICO, TÉRMICO, ANTI-FURTO & LORAWAN)
+ * ========================================================================== */
+
+function SensorsModule({ data, updateContainer, updateSensor, addAlert, logAction }) {
+  const toast = useToast();
+  const [selectedSensorId, setSelectedSensorId] = useState(data.sensors[0]?.id || 'SN-0001');
+  const sensor = data.sensors.find(s => s.id === selectedSensorId) || data.sensors[0];
+  const container = sensor ? data.containers.find(c => c.id === sensor.containerId) : null;
+  const [simLevel, setSimLevel] = useState(container?.fillLevel ?? 50);
+  const [simTemp, setSimTemp] = useState(sensor?.temperatureC ?? 32);
+
+  useEffect(() => {
+    if (container) setSimLevel(container.fillLevel);
+    if (sensor) setSimTemp(sensor.temperatureC ?? 32);
+  }, [selectedSensorId]);
+
+  const sendTelemetry = () => {
+    if (!sensor || !container) return;
+    updateContainer(container.id, { fillLevel: simLevel });
+    updateSensor(sensor.id, {
+      lastReadingLevel: simLevel,
+      temperatureC: simTemp,
+      lastReadingAt: nowIso(),
+      connectivity: 'online',
+      bufferedPackets: 0,
+    });
+    logAction('TELEMETRIA_IOT', `${sensor.id} (${container.code}) → ${simLevel}%, ${simTemp}°C`);
+
+    if (simTemp >= 45) {
+      addAlert({
+        type: 'fire', containerId: container.code, containerCode: container.code,
+        message: `ALERTA TÉRMICO (${simTemp}°C): Risco de fogo em ${container.code} (${container.street})`,
+        severity: 'high', read: false
+      });
+      toast(`Alerta de incêndio (${simTemp}°C) em ${container.code}!`, 'error');
+    } else if (simLevel >= 90) {
+      addAlert({
+        type: 'critical', containerId: container.code, containerCode: container.code,
+        message: `${container.code} (${container.street}) crítico (${simLevel}%)`, severity: 'high', read: false
+      });
+      toast(`Alerta crítico gerado: ${container.code} (${simLevel}%)`, 'error');
+    } else {
+      toast(`Leitura LoRaWAN sincronizada: ${container.code} (${simLevel}% · ${simTemp}°C)`, 'success');
+    }
+  };
+
+  const toggleTiltAlert = (s) => {
+    const c = data.containers.find(x => x.id === s.containerId);
+    const nextTilt = s.tiltStatus === 'Estável' ? 'Tombamento / Anti-Furto' : 'Estável';
+    updateSensor(s.id, { tiltStatus: nextTilt });
+    if (nextTilt !== 'Estável' && c) {
+      addAlert({
+        type: 'theft', containerId: c.code, containerCode: c.code,
+        message: `Acelerómetro Anti-Furto: Movimentação anómala em ${c.code} (${c.street})`,
+        severity: 'high', read: false
+      });
+      toast(`Alerta anti-furto disparado em ${c.code}`, 'error');
+    } else {
+      toast(`Acelerómetro ${s.id} normalizado`, 'info');
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <Card className="p-4 space-y-3">
+        <h3 className="font-bold text-obsidian-900">Emulador Multissensor LoRaWAN</h3>
+        <Field label="Seleccionar Nó IoT">
+          <Select value={selectedSensorId} onChange={e => setSelectedSensorId(e.target.value)}>
+            {data.sensors.map(s => {
+              const c = data.containers.find(x => x.id === s.containerId);
+              return <option key={s.id} value={s.id}>{s.id} — {c?.code} ({c?.street})</option>;
+            })}
+          </Select>
+        </Field>
+        <Field label={`Nível Ultrassónico: ${simLevel}%`}>
+          <Input type="range" min="0" max="100" value={simLevel} onChange={e => setSimLevel(Number(e.target.value))} />
+        </Field>
+        <Field label={`Sensor Térmico (Alerta Fogo): ${simTemp}°C`}>
+          <Input type="range" min="20" max="75" value={simTemp} onChange={e => setSimTemp(Number(e.target.value))} />
+        </Field>
+        <div className="flex gap-2">
+          <Btn variant="ghost" className="flex-1 !text-xs" onClick={() => { setSimLevel(25); setSimTemp(30); }}>Normal</Btn>
+          <Btn variant="primary" className="flex-1 !text-xs" onClick={() => { setSimLevel(94); setSimTemp(34); }}>Crítico 94%</Btn>
+          <Btn variant="danger" className="flex-1 !text-xs" onClick={() => { setSimLevel(82); setSimTemp(56); }}>Fogo 56°C</Btn>
+        </div>
+        <Btn variant="savanna" className="w-full" onClick={sendTelemetry}>Transmitir Pacote LoRaWAN</Btn>
+      </Card>
+
+      <Card className="p-4 lg:col-span-2 overflow-auto">
+        <h3 className="font-bold text-obsidian-900 mb-3">Rede de Sensores Encapsulados ({data.sensors.length})</h3>
+        <table className="w-full text-sm tabular-nums">
+          <thead className="bg-obsidian-900 text-sand-50">
+            <tr>
+              {['Sensor', 'Contentor / Via', 'Nível', 'Temp.', 'Inclinação', 'LoRaWAN / Buffer', 'Acção'].map(h =>
+                <th key={h} className="text-left px-3 py-2 font-semibold">{h}</th>)}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-sand-100">
+            {data.sensors.map(s => {
+              const c = data.containers.find(x => x.id === s.containerId);
+              return (
+                <tr key={s.id} className="hover:bg-sand-50">
+                  <td className="px-3 py-2 font-mono font-bold text-xs">{s.id}</td>
+                  <td className="px-3 py-2 text-xs"><b>{c?.code}</b> · {c?.street}</td>
+                  <td className="px-3 py-2 font-bold">{s.lastReadingLevel}%</td>
+                  <td className={`px-3 py-2 text-xs font-bold ${s.temperatureC >= 40 ? 'text-terra-600' : 'text-obsidian-800'}`}>{s.temperatureC}°C</td>
+                  <td className="px-3 py-2 text-xs">{s.tiltStatus}</td>
+                  <td className="px-3 py-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${s.connectivity === 'online' ? 'bg-teal-100 text-teal-900' : 'bg-amber-100 text-amber-900'}`}>
+                      {s.connectivity === 'online' ? 'Online' : `Store-Forward (${s.bufferedPackets})`}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2">
+                    <Btn variant="ghost" className="!px-2 !py-1 !text-xs" onClick={() => toggleTiltAlert(s)}>
+                      {s.tiltStatus === 'Estável' ? 'Testar Anti-Furto' : 'Normalizar'}
+                    </Btn>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 14. MÓDULO 7 — VIATURAS & FROTA (POUPANÇA EM KWANZAS)
+ * ========================================================================== */
+
+function VehiclesModule({ data, setData, logAction }) {
+  const toast = useToast();
+  const toggleMaint = (v) => {
+    const next = v.status === 'maintenance' ? 'available' : 'maintenance';
+    setData(d => ({ ...d, vehicles: d.vehicles.map(x => x.id === v.id ? { ...x, status: next } : x) }));
+    logAction('FROTA_ESTADO', `${v.plate} → ${next}`);
+    toast(`Viatura ${v.plate}: ${next === 'available' ? 'operacional' : 'em manutenção'}`, 'info');
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 tabular-nums">
+      {data.vehicles.map(v => {
+        const drv = data.drivers.find(d => d.id === v.driverId);
+        return (
+          <Card key={v.id} className="p-4 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-obsidian-900">{v.plate}</span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                v.status === 'available' ? 'bg-teal-100 text-teal-900' :
+                v.status === 'in_route' ? 'bg-amber-100 text-amber-900' : 'bg-red-100 text-red-900'
+              }`}>
+                {v.status === 'available' ? 'Disponível' : v.status === 'in_route' ? 'Em Rota' : 'Manutenção'}
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-obsidian-800">{v.type} · {v.capacityTons}t</p>
+            <p className="text-xs text-stone-500">Motorista: <b className="text-obsidian-900">{drv?.name || '—'}</b></p>
+            <p className="text-xs text-stone-500">Odómetro: {v.kmTotal.toLocaleString('pt-PT')} km</p>
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-2 text-xs">
+              <span className="text-stone-500 block text-[10px] uppercase">Poupança Gasóleo (Mês)</span>
+              <b className="text-savanna-600 text-sm">{(v.fuelSavedKz || 0).toLocaleString('pt-PT')} Kz</b>
+            </div>
+            <Btn variant="ghost" className="w-full !text-xs" onClick={() => toggleMaint(v)} disabled={v.status === 'in_route'}>
+              {v.status === 'maintenance' ? 'Concluir Manutenção' : 'Enviar p/ Manutenção'}
+            </Btn>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 15. MÓDULO 8 — RECOLHAS AUDITADAS (ATERRO DOS MULENVOS & TRIAGEM)
+ * ========================================================================== */
+
+function CollectionsModule({ data }) {
+  return (
+    <Card className="p-4 overflow-auto">
+      <h3 className="font-bold text-obsidian-900 mb-3">Registo Auditado de Destinação Final ({data.collections.length})</h3>
+      <table className="w-full text-sm tabular-nums">
+        <thead className="bg-obsidian-900 text-sand-50">
+          <tr>
+            {['Data/Hora', 'Contentor', 'Município', 'Viatura', 'Antes → Depois', 'Destino Final', 'Evidências'].map(h =>
+              <th key={h} className="text-left px-3 py-2.5 font-semibold">{h}</th>)}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-sand-100">
+          {data.collections.map(c => (
+            <tr key={c.id} className="hover:bg-sand-50">
+              <td className="px-3 py-2 text-xs">{fmtDate(c.timestamp)}</td>
+              <td className="px-3 py-2 font-extrabold text-obsidian-900">{c.containerCode}</td>
+              <td className="px-3 py-2 text-xs">{c.municipality} ({c.province})</td>
+              <td className="px-3 py-2 font-mono text-xs">{c.vehiclePlate}</td>
+              <td className="px-3 py-2 font-bold">{c.beforeLevel}% → {c.afterLevel}%</td>
+              <td className="px-3 py-2 text-xs font-semibold text-savanna-600">{c.destination || 'Aterro Sanitário dos Mulenvos'}</td>
+              <td className="px-3 py-2 text-xs">{(c.evidence || []).join(' + ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Card>
+  );
+}
+
+/* ============================================================================
+ * 16. MÓDULO 9 — PORTAL DO CIDADÃO (OCORRÊNCIAS COM FOTO & LOCALIZAÇÃO)
+ * ========================================================================== */
+
+function CitizenModule({ data, setData, updateContainer, addAlert, logAction }) {
+  const toast = useToast();
+  const [form, setForm] = useState({
+    containerCode: data.containers[0]?.code || 'KL-0001',
+    category: 'Transbordo de resíduos',
+    description: '',
+    photoTag: 'Foto_Via_Publica_AO.jpg',
+    reporter: '',
+  });
+
+  const submitReport = () => {
+    const target = data.containers.find(c => c.code === form.containerCode);
+    const rep = {
+      id: 'CID-' + String((data.citizenReports?.length || 0) + 1).padStart(3, '0'),
+      containerCode: form.containerCode,
+      province: target?.province || 'Luanda',
+      location: target ? `${target.municipality} — ${target.street}` : form.containerCode,
+      category: form.category,
+      description: form.description.trim() || 'Reporte registado pelo canal cidadão Kiela.',
+      photoTag: form.photoTag || 'Evidência Fotográfica Georreferenciada',
+      reporter: form.reporter.trim() || 'Munícipe (+244)',
+      timestamp: nowIso(),
+      status: 'pending',
+    };
+    setData(d => ({ ...d, citizenReports: [rep, ...(d.citizenReports || [])] }));
+    logAction('REPORTE_CIDADAO', `${rep.id} (${rep.containerCode})`);
+    toast(`Ocorrência ${rep.id} registada com evidência fotográfica`, 'success');
+    setForm(f => ({ ...f, description: '' }));
+  };
+
+  const triageReport = (rep, nextStatus) => {
+    setData(d => ({
+      ...d,
+      citizenReports: (d.citizenReports || []).map(r => r.id === rep.id ? { ...r, status: nextStatus } : r),
+    }));
+    if (nextStatus === 'dispatched') {
+      const target = data.containers.find(c => c.code === rep.containerCode);
+      if (target && target.fillLevel < 85) updateContainer(target.id, { fillLevel: 91 });
+      addAlert({
+        type: 'full', containerId: rep.containerCode, containerCode: rep.containerCode,
+        message: `Prioridade Cidadã (${rep.id}): ${rep.location}`, severity: 'high', read: false
+      });
+    }
+    logAction('TRIAGEM_CIDADAO', `${rep.id} → ${nextStatus}`);
+    toast(`Ticket ${rep.id} actualizado`, 'info');
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <Card className="p-4 space-y-3">
+        <h3 className="font-bold text-obsidian-900">Canal Cidadão Georreferenciado</h3>
+        <Field label="Contentor / Via Próxima">
+          <Select value={form.containerCode} onChange={e => setForm({ ...form, containerCode: e.target.value })}>
+            {data.containers.map(c => <option key={c.id} value={c.code}>{c.code} — {c.street} ({c.municipality})</option>)}
+          </Select>
+        </Field>
+        <Field label="Tipo de Ocorrência">
+          <Select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+            <option>Transbordo de resíduos</option>
+            <option>Fumo / risco de incêndio</option>
+            <option>Depósito ilegal na via pública</option>
+            <option>Contentor danificado / vandalizado</option>
+          </Select>
+        </Field>
+        <Field label="Evidência Fotográfica">
+          <div className="flex items-center gap-2 border border-sand-200 rounded-lg px-3 py-2 bg-sand-50 text-xs">
+            <Icon name="camera" className="w-4 h-4 text-ochre-600" />
+            <input value={form.photoTag} onChange={e => setForm({ ...form, photoTag: e.target.value })} className="bg-transparent flex-1 focus:outline-none" />
+          </div>
+        </Field>
+        <Field label="Descrição">
+          <Input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Detalhes do ponto..." />
+        </Field>
+        <Field label="Telemóvel do Munícipe">
+          <Input value={form.reporter} onChange={e => setForm({ ...form, reporter: e.target.value })} placeholder="+244 923 000 000" />
+        </Field>
+        <Btn variant="savanna" className="w-full" onClick={submitReport}>Enviar Ocorrência</Btn>
+      </Card>
+
+      <Card className="p-4 lg:col-span-2 space-y-2.5">
+        <h3 className="font-bold text-obsidian-900">Tickets &amp; Triagem Operacional ({(data.citizenReports || []).length})</h3>
+        <div className="divide-y divide-sand-100">
+          {(data.citizenReports || []).map(r => {
+            const st = CITIZEN_STATUS[r.status] || CITIZEN_STATUS.pending;
+            return (
+              <div key={r.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-xs text-obsidian-900">{r.id} · {r.containerCode}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${st.bg} ${st.text}`}>{st.label}</span>
+                  </div>
+                  <p className="text-xs font-bold text-obsidian-800 mt-0.5">{r.category} — {r.location}</p>
+                  <p className="text-xs text-stone-500">{r.description} · <span className="text-ochre-600 font-medium">{r.photoTag}</span></p>
+                </div>
+                <div className="flex gap-1.5">
+                  {r.status === 'pending' && (
+                    <Btn variant="primary" className="!px-2.5 !py-1 !text-xs" onClick={() => triageReport(r, 'dispatched')}>Priorizar Rota</Btn>
+                  )}
+                  {r.status !== 'resolved' && (
+                    <Btn variant="savanna" className="!px-2.5 !py-1 !text-xs" onClick={() => triageReport(r, 'resolved')}>Resolver</Btn>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 17. MÓDULO 10 — ESG, GRANDES GERADORES (REFRIANGO) & ECO-PONTOS
+ * ========================================================================== */
+
+const ECO_MATERIAL_RATES = {
+  'Plástico PET': 50,
+  'Alumínio':     80,
+  'Vidro':        30,
+  'Papel/Cartão': 25,
+};
+
+const ECO_REWARDS_CATALOG = [
+  { id: 'REW-01', title: 'Recarga Saldo Unitel / Africell (1.000 Kz)', points: 500,  partner: 'Telecom Angola' },
+  { id: 'REW-02', title: 'Desconto 15% na Taxa de Saneamento Municipal', points: 1200, partner: 'Administração Municipal' },
+  { id: 'REW-03', title: 'Vale Compras Alimentar (5.000 Kz)',          points: 2000, partner: 'Rede Supermercados Luanda' },
+];
+
+function computePseudoSha256(seedStr) {
+  let h1 = 0x811c9dc5;
+  let h2 = 0x1b873593;
+  for (let i = 0; i < seedStr.length; i++) {
+    const ch = seedStr.charCodeAt(i);
+    h1 ^= ch;
+    h1 = Math.imul(h1, 0x01000193);
+    h2 ^= (ch + i * 17);
+    h2 = Math.imul(h2, 0x85ebca6b);
+  }
+  const partA = (h1 >>> 0).toString(16).padStart(8, '0');
+  const partB = (h2 >>> 0).toString(16).padStart(8, '0');
+  const partC = ((h1 ^ h2) >>> 0).toString(16).padStart(8, '0');
+  const partD = ((h1 + h2) >>> 0).toString(16).padStart(8, '0');
+  return (partA + partB + partC + partD + partA + partB + partC + partD).toUpperCase();
+}
+
+function EsgCertificateModal({ generator, onClose }) {
+  const qrRef = useRef(null);
+
+  const auditHash = useMemo(() => {
+    if (!generator) return '';
+    return computePseudoSha256(`${generator.id}|${generator.nif}|${generator.monthlyKg}|${generator.recoveryRate}`);
+  }, [generator]);
+
+  const certCode = generator ? `KIELA-ESG-${generator.id}-2026` : '';
+
+  useEffect(() => {
+    if (qrRef.current && generator) {
+      qrRef.current.innerHTML = '';
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrRef.current, {
+            text: `KIELA-AO-ESG:${certCode}|NIF:${generator.nif}|HASH:${auditHash.slice(0, 16)}`,
+            width: 112,
+            height: 112,
+          });
+        }
+      } catch (e) {}
+    }
+  }, [generator, certCode, auditHash]);
+
+  if (!generator) return null;
+
+  const divertedKg = Math.round(generator.monthlyKg * (generator.recoveryRate / 100));
+  const co2AvoidedTons = ((divertedKg / 1000) * 1.42).toFixed(2);
+
+  return (
+    <Modal open={true} onClose={onClose} title="Certificado Digital de Destinação Final (ESG)" wide>
+      <div className="border-2 border-obsidian-900 rounded-xl p-5 bg-white space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-200 pb-4">
+          <div className="flex items-center gap-3">
+            <KielaLogo size={44} />
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-savanna-600">República de Angola · Conformidade Ambiental Kiela</p>
+              <h2 className="text-lg font-extrabold text-obsidian-900">Certificado de Destinação Final &amp; Valorização ESG</h2>
+              <p className="text-xs text-stone-500">Documento N.º <b>{certCode}</b> · Emitido em {fmtDate(nowIso())}</p>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-ochre-600 border border-ochre-500/30">
+            {generator.status}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div className="bg-sand-50 rounded-lg p-3 space-y-1">
+            <p className="font-bold text-obsidian-900 uppercase">Entidade Geradora</p>
+            <p><b>Razão Social:</b> {generator.name}</p>
+            <p><b>NIF Angolano:</b> {generator.nif}</p>
+            <p><b>Jurisdição:</b> {generator.municipality}, Província de {generator.province}</p>
+            <p><b>Tipologia:</b> {generator.wasteType}</p>
+          </div>
+          <div className="bg-sand-50 rounded-lg p-3 space-y-1">
+            <p className="font-bold text-obsidian-900 uppercase">Operador &amp; Destino Final Auditado</p>
+            <p><b>Operador:</b> Kiela Inteligência Urbana &amp; Economia Circular</p>
+            <p><b>Unidade de Destino:</b> {generator.destination}</p>
+            <p><b>Volume Auditado:</b> {generator.monthlyKg.toLocaleString('pt-PT')} kg/mês</p>
+            <p><b>Taxa de Valorização:</b> {generator.recoveryRate}% ({divertedKg.toLocaleString('pt-PT')} kg desviados)</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 text-center tabular-nums">
+          <div className="border border-savanna-600/30 bg-teal-50/50 rounded-lg p-2.5">
+            <p className="text-[11px] text-stone-500 uppercase">Massa Valorizada</p>
+            <p className="text-base font-extrabold text-savanna-600">{(divertedKg / 1000).toFixed(2)} t</p>
+          </div>
+          <div className="border border-ochre-500/30 bg-amber-50/50 rounded-lg p-2.5">
+            <p className="text-[11px] text-stone-500 uppercase">Créditos Carbono</p>
+            <p className="text-base font-extrabold text-ochre-600">{co2AvoidedTons} tCO₂e</p>
+          </div>
+          <div className="border border-savanna-600/30 bg-teal-50/50 rounded-lg p-2.5">
+            <p className="text-[11px] text-stone-500 uppercase">Conformidade</p>
+            <p className="text-base font-extrabold text-savanna-600">100% Auditada</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-sand-200 pt-3">
+          <div className="space-y-1 text-xs flex-1 min-w-0">
+            <p className="font-bold text-obsidian-900">Assinatura Criptográfica SHA-256</p>
+            <p className="font-mono text-[10px] text-stone-500 break-all">{auditHash}</p>
+            <p className="text-[11px] text-stone-500">
+              Válido para auditorias ambientais, relatórios ESG e licenciamento municipal em Angola.
+            </p>
+          </div>
+          <div className="text-center flex-shrink-0">
+            <div ref={qrRef} className="bg-white p-1.5 rounded-lg border border-sand-200 mx-auto w-fit" />
+            <p className="text-[10px] font-mono text-stone-500 mt-1">Validar QR</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 mt-4 no-print">
+        <Btn variant="ghost" onClick={onClose}>Fechar</Btn>
+        <Btn variant="savanna" onClick={() => window.print()}>
+          <Icon name="print" className="w-4 h-4" />
+          <span>Imprimir / Guardar PDF</span>
+        </Btn>
+      </div>
+    </Modal>
+  );
+}
+
+function EsgModule({ data, setData, logAction }) {
+  const toast = useToast();
+  const [tab, setTab] = useState('generators');
+  const [certGenerator, setCertGenerator] = useState(null);
+  const [ecoForm, setEcoForm] = useState({
+    containerCode: data.containers[0]?.code || 'KL-0001',
+    material: 'Plástico PET',
+    weightKg: 6,
+    citizen: '',
+  });
+
+  const generators = data.esgGenerators || [];
+  const ecoTx = data.ecoPointTx || [];
+
+  const kpis = useMemo(() => {
+    const genDivertedKg = generators.reduce((acc, g) => acc + (g.monthlyKg * (g.recoveryRate / 100)), 0);
+    const citizenKg = ecoTx.reduce((acc, t) => acc + (t.weightKg || 0), 0);
+    const totalTons = +((genDivertedKg + citizenKg) / 1000).toFixed(1);
+    const carbonCredits = +(totalTons * 1.42).toFixed(1);
+    const totalEcoPoints = ecoTx.reduce((acc, t) => acc + (t.points || 0), 0);
+    return { totalTons, carbonCredits, certifiedCount: generators.length, totalEcoPoints };
+  }, [generators, ecoTx]);
+
+  const calculatedPoints = Math.round((Number(ecoForm.weightKg) || 0) * (ECO_MATERIAL_RATES[ecoForm.material] || 40));
+
+  const handleDepositEcoPoints = () => {
+    const w = Number(ecoForm.weightKg);
+    if (!w || w <= 0) {
+      toast('Indique um peso válido em kg.', 'warn');
+      return;
+    }
+    const target = data.containers.find(c => c.code === ecoForm.containerCode);
+    const tx = {
+      id: 'ECO-' + (200 + ecoTx.length + 1),
+      citizen: ecoForm.citizen.trim() || '+244 923 000 999 (Munícipe QR)',
+      containerCode: ecoForm.containerCode,
+      location: target ? `${target.municipality} — ${target.street}` : 'Ecoponto Inteligente',
+      material: ecoForm.material,
+      weightKg: w,
+      points: calculatedPoints,
+      timestamp: nowIso(),
+    };
+    setData(d => ({ ...d, ecoPointTx: [tx, ...(d.ecoPointTx || [])] }));
+    logAction('ECOPONTOS_DEPOSITO', `${tx.citizen} +${tx.points} pts (${w} kg ${tx.material})`);
+    toast(`+${tx.points} Eco-Pontos creditados (${w} kg de ${tx.material})`, 'success');
+    setEcoForm(f => ({ ...f, weightKg: 6, citizen: '' }));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <HeroStatCard label="Desviado do Aterro" value={Math.round(kpis.totalTons)} suffix=" t" delta="+19% reciclagem" accent="savanna" icon="leaf" sparkPoints={[42, 48, 55, 61, 67, 73, Math.round(kpis.totalTons)]} />
+        <HeroStatCard label="Créditos Carbono" value={Math.round(kpis.carbonCredits)} suffix=" tCO₂e" delta="Auditado ISO-14064" accent="ochre" icon="spark" sparkPoints={[58, 66, 75, 84, 93, 102, Math.round(kpis.carbonCredits)]} />
+        <HeroStatCard label="Grandes Geradores" value={kpis.certifiedCount} delta="Certificados SHA-256" accent="savanna" icon="award" sparkPoints={[2, 2, 3, 3, 4, 4, kpis.certifiedCount]} />
+        <HeroStatCard label="Eco-Pontos Emitidos" value={kpis.totalEcoPoints} delta="Programa Cidadão" accent="terra" icon="coin" sparkPoints={[450, 620, 790, 950, 1100, 1210, kpis.totalEcoPoints]} />
+      </div>
+
+      <Card className="p-2 flex flex-wrap gap-2">
+        <button type="button" onClick={() => setTab('generators')}
+          className={`px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 transition ${
+            tab === 'generators' ? 'bg-obsidian-900 text-ochre-400 shadow-sm' : 'text-obsidian-900 hover:bg-sand-100'
+          }`}>
+          <Icon name="award" className="w-4 h-4" />
+          <span>Grandes Geradores &amp; Certificados ESG</span>
+        </button>
+        <button type="button" onClick={() => setTab('ecopoints')}
+          className={`px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 transition ${
+            tab === 'ecopoints' ? 'bg-savanna-600 text-white shadow-sm' : 'text-obsidian-900 hover:bg-sand-100'
+          }`}>
+          <Icon name="leaf" className="w-4 h-4" />
+          <span>Programa Eco-Pontos (Reciclagem Cidadã)</span>
+        </button>
+      </Card>
+
+      {tab === 'generators' && (
+        <Card className="p-4 overflow-auto animate-fade-up">
+          <table className="w-full text-sm tabular-nums">
+            <thead className="bg-obsidian-900 text-sand-50">
+              <tr>
+                {['Entidade Geradora', 'NIF', 'Município', 'Tipologia', 'Volume/Mês', 'Valorização', 'Certificado'].map(h =>
+                  <th key={h} className="text-left px-3 py-2.5 font-semibold">{h}</th>)}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-sand-100">
+              {generators.map(g => (
+                <tr key={g.id} className="hover:bg-sand-50 transition">
+                  <td className="px-3 py-2.5">
+                    <p className="font-bold text-obsidian-900">{g.name}</p>
+                    <p className="text-[11px] text-stone-500">{g.destination}</p>
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-xs">{g.nif}</td>
+                  <td className="px-3 py-2.5">{g.municipality} ({g.province})</td>
+                  <td className="px-3 py-2.5 text-xs">{g.wasteType}</td>
+                  <td className="px-3 py-2.5 font-semibold">{g.monthlyKg.toLocaleString('pt-PT')} kg</td>
+                  <td className="px-3 py-2.5 font-extrabold text-savanna-600">{g.recoveryRate}%</td>
+                  <td className="px-3 py-2.5 whitespace-nowrap">
+                    <Btn variant="primary" className="!px-2.5 !py-1 !text-xs" onClick={() => setCertGenerator(g)}>
+                      <Icon name="qr" className="w-3.5 h-3.5" />
+                      <span>Certificado SHA-256</span>
+                    </Btn>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+
+      {tab === 'ecopoints' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-up">
+          <Card className="p-4 space-y-3">
+            <h3 className="font-bold text-obsidian-900">Simulador Ecoponto Inteligente</h3>
+            <Field label="Ecoponto">
+              <Select value={ecoForm.containerCode} onChange={e => setEcoForm({ ...ecoForm, containerCode: e.target.value })}>
+                {data.containers.map(c => <option key={c.id} value={c.code}>{c.code} — {c.street}</option>)}
+              </Select>
+            </Field>
+            <Field label="Material Reciclável">
+              <Select value={ecoForm.material} onChange={e => setEcoForm({ ...ecoForm, material: e.target.value })}>
+                {Object.entries(ECO_MATERIAL_RATES).map(([mat, pts]) => <option key={mat} value={mat}>{mat} ({pts} pts/kg)</option>)}
+              </Select>
+            </Field>
+            <Field label="Peso Depositado (kg)">
+              <Input type="number" min="0.5" step="0.5" value={ecoForm.weightKg} onChange={e => setEcoForm({ ...ecoForm, weightKg: e.target.value })} />
+            </Field>
+            <Field label="Telemóvel do Munícipe">
+              <Input value={ecoForm.citizen} onChange={e => setEcoForm({ ...ecoForm, citizen: e.target.value })} placeholder="+244 923 000 000" />
+            </Field>
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-3 flex items-center justify-between tabular-nums">
+              <span className="text-xs font-semibold text-obsidian-900">Crédito Imediato:</span>
+              <span className="text-base font-extrabold text-savanna-600">+{calculatedPoints} Eco-Pontos</span>
+            </div>
+            <Btn variant="savanna" className="w-full" onClick={handleDepositEcoPoints}>Registar &amp; Creditar Pontos</Btn>
+          </Card>
+
+          <div className="lg:col-span-2 space-y-4">
+            <Card className="p-4">
+              <h3 className="font-bold text-obsidian-900 mb-2">Catálogo de Conversão Cidadã</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                {ECO_REWARDS_CATALOG.map(rw => (
+                  <div key={rw.id} className="border border-sand-200 rounded-xl p-3 bg-sand-50">
+                    <span className="text-xs font-extrabold text-ochre-600 bg-amber-100 px-2 py-0.5 rounded-full tabular-nums">{rw.points} pts</span>
+                    <p className="text-xs font-bold text-obsidian-900 mt-2">{rw.title}</p>
+                    <p className="text-[11px] text-stone-500 mt-1">{rw.partner}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-4 overflow-auto">
+              <h3 className="font-bold text-obsidian-900 mb-2">Transacções de Eco-Pontos</h3>
+              <table className="w-full text-sm tabular-nums">
+                <thead className="bg-obsidian-900 text-sand-50">
+                  <tr>
+                    {['Data', 'Munícipe', 'Material', 'Peso', 'Eco-Pontos'].map(h => <th key={h} className="text-left px-3 py-2 font-semibold">{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-sand-100">
+                  {ecoTx.map(t => (
+                    <tr key={t.id}>
+                      <td className="px-3 py-2 text-xs">{fmtDate(t.timestamp)}</td>
+                      <td className="px-3 py-2 font-semibold">{t.citizen}</td>
+                      <td className="px-3 py-2 text-xs">{t.material}</td>
+                      <td className="px-3 py-2">{t.weightKg} kg</td>
+                      <td className="px-3 py-2 font-extrabold text-savanna-600">+{t.points} pts</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {certGenerator && <EsgCertificateModal generator={certGenerator} onClose={() => setCertGenerator(null)} />}
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 18. MÓDULO 11 — RELATÓRIOS & IMPACTO CO2
+ * ========================================================================== */
+
+function ReportsModule({ data }) {
+  const toast = useToast();
+  const exportCsv = () => {
+    const header = 'ID,Data,Contentor,Provincia,Municipio,Viatura,Antes,Depois,Destino,CustoKz\n';
+    const rows = data.collections.map(c =>
+      [c.id, c.timestamp, c.containerCode, c.province, c.municipality, c.vehiclePlate, c.beforeLevel, c.afterLevel, c.destination, c.cost].join(',')
+    ).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kiela_relatorio_angola_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Relatório CSV Kiela exportado', 'success');
+  };
+
+  const byMun = useMemo(() => {
+    const map = {};
+    data.collections.forEach(c => {
+      if (!map[c.municipality]) map[c.municipality] = { municipality: c.municipality, total: 0, km: 0, cost: 0, co2Kg: 0 };
+      map[c.municipality].total += 1;
+      map[c.municipality].km += c.km || 0;
+      map[c.municipality].cost += c.cost || 0;
+      map[c.municipality].co2Kg += Math.round((c.km || 0) * 0.85);
+    });
+    return Object.values(map);
+  }, [data.collections]);
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-bold text-obsidian-900">Relatórios Operacionais &amp; Impacto Ambiental CO₂</h3>
+          <p className="text-xs text-stone-500">Indicadores auditados por município em Kwanzas (AOA) e toneladas de carbono evitadas</p>
+        </div>
+        <div className="flex gap-2">
+          <Btn variant="ghost" onClick={exportCsv}>
+            <Icon name="download" className="w-4 h-4" />
+            <span>Exportar CSV</span>
+          </Btn>
+          <Btn variant="primary" onClick={() => window.print()}>
+            <Icon name="print" className="w-4 h-4" />
+            <span>Imprimir PDF</span>
+          </Btn>
+        </div>
+      </Card>
+
+      <Card className="p-4 overflow-auto">
+        <table className="w-full text-sm tabular-nums">
+          <thead className="bg-obsidian-900 text-sand-50">
+            <tr>
+              {['Município', 'Recolhas Auditadas', 'Distância (km)', 'CO₂ Evitado (kg)', 'Custo Operacional (Kz)'].map(h =>
+                <th key={h} className="text-left px-3 py-2.5 font-semibold">{h}</th>)}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-sand-100">
+            {byMun.map(m => (
+              <tr key={m.municipality}>
+                <td className="px-3 py-2 font-bold text-obsidian-900">{m.municipality}</td>
+                <td className="px-3 py-2">{m.total}</td>
+                <td className="px-3 py-2">{m.km} km</td>
+                <td className="px-3 py-2 font-semibold text-savanna-600">{m.co2Kg} kg CO₂</td>
+                <td className="px-3 py-2 font-bold text-ochre-600">{m.cost.toLocaleString('pt-PT')} Kz</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 19. MÓDULO 12 — ADMINISTRAÇÃO (PERFIS RBAC, LIMIARES SLA & CONFIGURAÇÕES)
+ * ========================================================================== */
+
+const ALL_NAV = [
+  { id: 'dashboard',   section: 'Operação em Tempo Real',    perm: 'Dashboard',   label: 'Dashboard',         icon: 'dashboard' },
+  { id: 'map',         section: 'Operação em Tempo Real',    perm: 'Mapa',        label: 'Mapa Inteligente',  icon: 'map' },
+  { id: 'routes',      section: 'Operação em Tempo Real',    perm: 'Rotas',       label: 'Rotas & Despacho',  icon: 'route' },
+  { id: 'driver',      section: 'Operação em Tempo Real',    perm: 'Motorista',   label: 'App Motorista',     icon: 'phone' },
+  { id: 'containers',  section: 'Activos & Telemetria',      perm: 'Contentores', label: 'Contentores',       icon: 'trash' },
+  { id: 'sensors',     section: 'Activos & Telemetria',      perm: 'Sensores',    label: 'Sensores IoT',      icon: 'sensor' },
+  { id: 'vehicles',    section: 'Activos & Telemetria',      perm: 'Viaturas',    label: 'Viaturas & Frota',  icon: 'truck' },
+  { id: 'collections', section: 'Activos & Telemetria',      perm: 'Recolhas',    label: 'Recolhas',          icon: 'check' },
+  { id: 'citizen',     section: 'Sustentabilidade & Gestão', perm: 'Cidadão',     label: 'Portal do Cidadão', icon: 'megaphone' },
+  { id: 'esg',         section: 'Sustentabilidade & Gestão', perm: 'ESG',         label: 'ESG & Eco-Pontos',  icon: 'award' },
+  { id: 'reports',     section: 'Sustentabilidade & Gestão', perm: 'Relatórios',  label: 'Relatórios',        icon: 'chart' },
+  { id: 'admin',       section: 'Sustentabilidade & Gestão', perm: 'Admin',       label: 'Administração',     icon: 'shield' },
+];
+
+const PERMS = {
+  admin:      ALL_NAV.map(n => n.perm),
+  supervisor: ['Dashboard', 'Mapa', 'Contentores', 'Sensores', 'Viaturas', 'Rotas', 'Recolhas', 'Cidadão', 'ESG', 'Relatórios'],
+  driver:     ['Motorista', 'Recolhas', 'Cidadão'],
+};
+
+function AdminModule({ data, setData, logAction, onSwitchUser }) {
+  const toast = useToast();
+  const roles = ['admin', 'supervisor', 'driver'];
+  const settings = data.settings || { criticalThreshold: 90, fullThreshold: 75, fuelCostPerLiterKz: 300 };
+
+  const updateSetting = (key, val) => {
+    setData(d => ({ ...d, settings: { ...(d.settings || settings), [key]: val } }));
+    logAction('CONFIG_SLA', `${key} → ${val}`);
+    toast('Parâmetro operacional actualizado', 'success');
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 space-y-3">
+        <h3 className="font-bold text-obsidian-900">Parâmetros SLA &amp; Limiares de Telemetria</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 tabular-nums">
+          <Field label={`Limiar Alerta Crítico (${settings.criticalThreshold}%)`}>
+            <Input type="range" min="80" max="98" value={settings.criticalThreshold} onChange={e => updateSetting('criticalThreshold', Number(e.target.value))} />
+          </Field>
+          <Field label={`Limiar Contentor Cheio (${settings.fullThreshold}%)`}>
+            <Input type="range" min="60" max="85" value={settings.fullThreshold} onChange={e => updateSetting('fullThreshold', Number(e.target.value))} />
+          </Field>
+          <Field label="Custo Referência Gasóleo (Kz/Litro)">
+            <Input type="number" value={settings.fuelCostPerLiterKz} onChange={e => updateSetting('fuelCostPerLiterKz', Number(e.target.value) || 300)} />
+          </Field>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="font-bold text-obsidian-900 mb-3">Perfis de Acesso &amp; Utilizadores (RBAC)</h3>
+        <div className="overflow-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-obsidian-900 text-sand-50">
+              <tr>
+                {['Nome', 'Email', 'Perfil', 'Organização', 'Sessão'].map(h =>
+                  <th key={h} className="text-left px-3 py-2.5 font-semibold">{h}</th>)}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-sand-100">
+              {data.users.map(u => (
+                <tr key={u.id}>
+                  <td className="px-3 py-2 font-semibold">{u.name}</td>
+                  <td className="px-3 py-2 text-xs">{u.email}</td>
+                  <td className="px-3 py-2">
+                    <Select value={u.role} onChange={e => {
+                      const newRole = e.target.value;
+                      setData(d => ({
+                        ...d,
+                        users: d.users.map(x => x.id === u.id ? { ...x, role: newRole } : x),
+                        currentUser: d.currentUser?.id === u.id ? { ...d.currentUser, role: newRole } : d.currentUser
+                      }));
+                      logAction('PERFIL', `${u.name} → ${newRole}`);
+                    }} className="!py-1 !text-xs">
+                      {roles.map(r => <option key={r}>{r}</option>)}
+                    </Select>
+                  </td>
+                  <td className="px-3 py-2">{u.org}</td>
+                  <td className="px-3 py-2">
+                    <Btn variant="ghost" className="!px-2.5 !py-1 !text-xs" onClick={() => onSwitchUser(u.email)}>Alternar Perfil</Btn>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================================
+ * 20. ORQUESTRADOR PRINCIPAL KIELA
+ * ========================================================================== */
+
+class ErrorBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  render() {
+    if (this.state.err) {
+      return (
+        <div style={{ padding: 24 }}>
+          <div style={{ background: '#fef2f2', border: '2px solid #c2410c', borderRadius: 12, padding: 20 }}>
+            <h2 style={{ color: '#7f1d1d', margin: '0 0 8px' }}>Erro na aplicação</h2>
+            <p>{String(this.state.err.message || this.state.err)}</p>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function AppInner() {
+  const toast = useToast();
+  const [data, setData] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.containers && parsed.currentUser) return parsed;
+      }
+    } catch (e) {}
+    return buildSeed();
+  });
+
+  const [page, setPage] = useState('dashboard');
+  const [detailId, setDetailId] = useState(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [mobileNav, setMobileNav] = useState(false);
+  const [globalQuery, setGlobalQuery] = useState('');
+
+  useEffect(() => { document.getElementById('root').dataset.mounted = '1'; }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+    }, 300);
+    return () => clearTimeout(t);
+  }, [data]);
+
+  const logAction = useCallback((action, detail) => setData(d => ({
+    ...d, auditLog: [{ id: uid('LOG'), timestamp: nowIso(), user: d.currentUser?.name || 'sistema', action, detail }, ...d.auditLog].slice(0, 100)
+  })), []);
+
+  const updateContainer = useCallback((id, patch) => setData(d => ({ ...d, containers: d.containers.map(c => c.id === id ? { ...c, ...patch } : c) })), []);
+  const updateSensor    = useCallback((id, patch) => setData(d => ({ ...d, sensors: d.sensors.map(s => s.id === id ? { ...s, ...patch } : s) })), []);
+  const addAlert        = useCallback((a) => setData(d => ({ ...d, alerts: [{ ...a, id: uid('AL'), timestamp: nowIso() }, ...d.alerts].slice(0, 60) })), []);
+
+  const allowedNav = useMemo(() => {
+    const role = data.currentUser?.role || 'admin';
+    const allowedPerms = PERMS[role] || PERMS.admin;
+    return ALL_NAV.filter(n => allowedPerms.includes(n.perm));
+  }, [data.currentUser?.role]);
+
+  const navSections = useMemo(() => {
+    const groups = {};
+    allowedNav.forEach(item => {
+      if (!groups[item.section]) groups[item.section] = [];
+      groups[item.section].push(item);
+    });
+    return Object.entries(groups);
+  }, [allowedNav]);
+
+  const globalHits = useMemo(() => {
+    const q = globalQuery.trim().toLowerCase();
+    if (!q) return [];
+    const hits = [];
+    data.containers.forEach(c => {
+      if (c.code.toLowerCase().includes(q) || c.street.toLowerCase().includes(q) || c.municipality.toLowerCase().includes(q)) {
+        hits.push({ kind: 'Contentor', title: `${c.code} · ${c.street}`, sub: `${c.municipality} (${c.fillLevel}%)`, action: () => { setDetailId(c.id); setGlobalQuery(''); } });
+      }
+    });
+    data.vehicles.forEach(v => {
+      if (v.plate.toLowerCase().includes(q) || v.type.toLowerCase().includes(q)) {
+        hits.push({ kind: 'Viatura', title: v.plate, sub: v.type, action: () => { setPage('vehicles'); setGlobalQuery(''); } });
+      }
+    });
+    return hits.slice(0, 6);
+  }, [globalQuery, data.containers, data.vehicles]);
+
+  useEffect(() => {
+    if (!data.currentUser) return;
+    if (!allowedNav.some(n => n.id === page)) {
+      setPage(allowedNav[0]?.id || 'dashboard');
+    }
+  }, [allowedNav, page, data.currentUser]);
+
+  const login = (email) => {
+    const u = data.users.find(x => x.email === email) || data.users[0];
+    setData(d => ({ ...d, currentUser: u }));
+    const firstPage = ALL_NAV.find(n => (PERMS[u.role] || PERMS.admin).includes(n.perm))?.id || 'dashboard';
+    setPage(firstPage);
+    logAction('LOGIN', `${u.name} (${u.role})`);
+    toast(`Bem-vindo ao Kiela, ${u.name}`, 'success');
+  };
+
+  const logout = () => {
+    setData(d => ({ ...d, currentUser: null }));
+    toast('Sessão encerrada', 'info');
+  };
+
+  const createContainer = (form) => {
+    const n = data.containers.length + 1;
+    const code = 'KL-' + String(n).padStart(4, '0');
+    const sensorId = 'SN-' + String(n).padStart(4, '0');
+    const c = { id: code, code, ...form, sensorId, lastCollectionAt: nowIso() };
+    const s = {
+      id: sensorId, containerId: code, battery: 100, connectivity: 'online', status: 'ok',
+      temperatureC: 30, tiltStatus: 'Estável', bufferedPackets: 0,
+      lastReadingAt: nowIso(), lastReadingLevel: form.fillLevel
+    };
+    setData(d => ({ ...d, containers: [c, ...d.containers], sensors: [s, ...d.sensors] }));
+    logAction('CRIAR_CONTENTOR', code);
+    setCreateOpen(false);
+  };
+
+  const resetDemo = () => {
+    const fresh = buildSeed();
+    fresh.currentUser = data.currentUser;
+    setData(fresh);
+    setPage('dashboard');
+    toast('Cenário Kiela Angola restaurado', 'info');
+  };
+
+  if (!data.currentUser) return <LoginScreen onLogin={login} />;
+
+  const titles = Object.fromEntries(ALL_NAV.map(n => [n.id, n.label]));
+  const unreadAlerts = data.alerts.filter(a => !a.read).length;
+
+  return (
+    <div className="min-h-screen flex bg-sand-50">
+      <aside className={`${mobileNav ? 'block' : 'hidden'} md:block fixed md:static inset-y-0 left-0 z-40 w-64 samakaka-bg text-sand-50 flex-shrink-0 overflow-y-auto flex flex-col border-r border-obsidian-800`}>
+        <div className="afro-ribbon" />
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <KielaLogo size={38} />
+            <div>
+              <p className="font-extrabold text-lg leading-none tracking-tight text-white">Kiela</p>
+              <p className="text-[10px] text-ochre-400 font-bold uppercase tracking-wider mt-1">Economia Circular</p>
+            </div>
+          </div>
+          <button className="md:hidden text-white/70" onClick={() => setMobileNav(false)}>
+            <Icon name="close" className="w-5 h-5" />
+          </button>
+        </div>
+
+        <nav className="p-3 space-y-4 flex-1">
+          {navSections.map(([sectionTitle, items]) => (
+            <div key={sectionTitle}>
+              <p className="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-ochre-400/75">{sectionTitle}</p>
+              <div className="space-y-0.5">
+                {items.map(n => (
+                  <button key={n.id} onClick={() => { setPage(n.id); setMobileNav(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2.5 transition ${
+                      page === n.id
+                        ? 'bg-ochre-500 text-white font-bold shadow-sm'
+                        : 'hover:bg-white/10 text-stone-300'
+                    }`}>
+                    <Icon name={n.icon} className="w-4 h-4" />
+                    <span className="truncate">{n.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        <div className="p-3.5 border-t border-white/10 text-xs text-stone-300 bg-obsidian-950/60">
+          <p className="font-bold text-white">{data.currentUser.name}</p>
+          <p className="capitalize text-ochre-400 font-semibold">{data.currentUser.role} · {data.currentUser.org}</p>
+          <button onClick={logout} className="mt-2 text-stone-400 hover:text-white underline">Terminar sessão</button>
+        </div>
+      </aside>
+
+      <div className="flex-1 min-w-0 flex flex-col">
+        <div className="afro-ribbon no-print" />
+        <header className="bg-white border-b border-sand-200 px-4 py-2.5 flex items-center gap-3 no-print sticky top-0 z-30">
+          <button className="md:hidden text-obsidian-900" onClick={() => setMobileNav(v => !v)}>
+            <Icon name="menu" className="w-5 h-5" />
+          </button>
+          <div className="min-w-0">
+            <h1 className="font-extrabold text-obsidian-900 text-base truncate">{titles[page]}</h1>
+            <p className="text-[11px] text-stone-500 hidden sm:block">Kiela · Inteligência Urbana &amp; Economia Circular (Angola)</p>
+          </div>
+
+          <div className="relative flex-1 max-w-sm ml-2 hidden md:block">
+            <div className="relative">
+              <span className="absolute left-2.5 top-2 text-stone-400">
+                <Icon name="search" className="w-4 h-4" />
+              </span>
+              <input
+                value={globalQuery}
+                onChange={e => setGlobalQuery(e.target.value)}
+                placeholder="Pesquisar contentor, Rua Dr. Agostinho Neto - Viana ou matrícula..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-sand-100 border border-sand-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-ochre-500/30"
+              />
+            </div>
+            {globalHits.length > 0 && (
+              <div className="absolute left-0 right-0 mt-1 bg-white border border-sand-200 rounded-xl shadow-xl z-50 divide-y divide-sand-100 overflow-hidden">
+                {globalHits.map((h, i) => (
+                  <button key={i} type="button" onClick={h.action} className="w-full text-left px-3 py-2 hover:bg-sand-50 transition">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-obsidian-900">{h.title}</span>
+                      <span className="text-[10px] font-bold uppercase text-savanna-600">{h.kind}</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500">{h.sub}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <button onClick={() => setPage('dashboard')} title="Alertas activos"
+              className="relative px-2.5 py-1.5 rounded-lg border border-sand-200 hover:bg-sand-100 text-obsidian-900">
+              <Icon name="bell" className="w-4 h-4" />
+              {unreadAlerts > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-terra-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center tabular-nums">
+                  {unreadAlerts}
+                </span>
+              )}
+            </button>
+
+            <Btn variant="ghost" onClick={resetDemo}>
+              <Icon name="refresh" className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Repor Demo</span>
+            </Btn>
+          </div>
+        </header>
+
+        <main className="p-4 flex-1">
+          {page === 'dashboard' && <Dashboard data={data} setData={setData} logAction={logAction} go={setPage}
+            onMarkAllAlertsRead={() => setData(d => ({ ...d, alerts: d.alerts.map(a => ({ ...a, read: true })) }))}
+            onInspectContainer={(code) => setDetailId(code)} />}
+          {page === 'map' && <MapModule data={data} selectContainer={(id) => setDetailId(id)} />}
+          {page === 'containers' && <ContainersModule data={data} setData={setData} logAction={logAction}
+            openDetail={setDetailId} openCreate={() => setCreateOpen(true)} />}
+          {page === 'sensors' && <SensorsModule data={data} updateContainer={updateContainer} updateSensor={updateSensor}
+            addAlert={addAlert} logAction={logAction} />}
+          {page === 'vehicles' && <VehiclesModule data={data} setData={setData} logAction={logAction} />}
+          {page === 'routes' && <RoutesModule data={data} setData={setData} logAction={logAction} />}
+          {page === 'driver' && <DriverModule data={data} setData={setData} updateContainer={updateContainer}
+            addAlert={addAlert} logAction={logAction} />}
+          {page === 'collections' && <CollectionsModule data={data} />}
+          {page === 'citizen' && <CitizenModule data={data} setData={setData} updateContainer={updateContainer}
+            addAlert={addAlert} logAction={logAction} />}
+          {page === 'esg' && <EsgModule data={data} setData={setData} logAction={logAction} />}
+          {page === 'reports' && <ReportsModule data={data} />}
+          {page === 'admin' && <AdminModule data={data} setData={setData} logAction={logAction} onSwitchUser={login} />}
+        </main>
+      </div>
+
+      {detailId && <ContainerDetailModal data={data} containerId={detailId} onClose={() => setDetailId(null)} />}
+      <ContainerFormModal open={createOpen} onClose={() => setCreateOpen(false)} onCreate={createContainer}
+        nextCode={'KL-' + String(data.containers.length + 1).padStart(4, '0')} />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <ToastProvider>
+        <AppInner />
+      </ToastProvider>
+    </ErrorBoundary>
+  );
+}
+
+const rootEl = document.getElementById('root');
+const root = ReactDOM.createRoot ? ReactDOM.createRoot(rootEl) : { render: (el) => ReactDOM.render(el, rootEl) };
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
